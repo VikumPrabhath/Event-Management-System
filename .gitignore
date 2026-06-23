@@ -1,0 +1,15 @@
+# Software installers (too large for GitHub)
+Software/
+
+# Backend build files
+Backend/event-management-system/target/
+Backend/event-management-system/.idea/
+Backend/event-management-system/*.iml
+
+# Frontend dependencies
+frontend/node_modules/
+frontend/.env
+
+# OS files
+.DS_Store
+Thumbs.db
