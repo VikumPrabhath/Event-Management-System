@@ -1,0 +1,177 @@
+.footer {
+  background-color: #3b3d75; /* Purplish-blue color matching design */
+  color: #ffffff;
+  padding: 60px 5% 40px 5%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-align: left;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  gap: 60px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* About Column */
+.footer-logo-img {
+  height: 40px;
+  object-fit: contain;
+}
+
+.logo-fallback-footer {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-fallback-footer::before {
+  content: '⚡';
+  margin-right: 6px;
+  font-size: 24px;
+}
+
+.logo-fallback-footer .logo-sell {
+  color: #ffffff;
+}
+
+.logo-fallback-footer .logo-out {
+  color: #ff6a13;
+}
+
+.footer-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.social-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.social-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  fill: #ffffff;
+}
+
+.social-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.social-icon:hover {
+  transform: translateY(-3px);
+  background-color: #ff6a13;
+}
+
+/* Sitemap Column */
+.footer-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  position: relative;
+}
+
+.title-dot {
+  color: #ff6a13;
+  margin-right: 4px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.footer-links a:hover {
+  opacity: 1;
+  color: #ff6a13;
+}
+
+/* Contact Column */
+.contact-details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-details-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contact-icon {
+  font-size: 18px;
+  color: #ff6a13;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.contact-text {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Responsiveness */
+@media (max-width: 992px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  
+  .about-col {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .about-col {
+    grid-column: span 1;
+  }
+  
+  .footer {
+    padding: 40px 20px;
+  }
+}

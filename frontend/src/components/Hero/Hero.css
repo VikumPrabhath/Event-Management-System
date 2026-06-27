@@ -1,0 +1,124 @@
+.hero {
+  background: linear-gradient(135deg, #484b83, #5a5d9a);
+  color: #ffffff;
+  padding: 80px 20px;
+  text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  width: 100%;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 50px;
+  padding: 6px 6px 6px 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 600px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.search-input-wrapper:focus-within {
+  box-shadow: 0 10px 30px rgba(255, 106, 19, 0.25);
+  transform: translateY(-2px);
+}
+
+.search-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  color: #8c8c8c;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #1a1b4b;
+  width: 100%;
+  font-weight: 500;
+}
+
+.search-input::placeholder {
+  color: #ababab;
+}
+
+.search-btn {
+  background-color: #ff6a13;
+  color: #ffffff;
+  border: none;
+  padding: 14px 36px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.search-btn:hover {
+  background-color: #e0560a;
+}
+
+.search-btn:active {
+  transform: scale(0.97);
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .hero {
+    padding: 60px 20px;
+  }
+  
+  .hero-title {
+    font-size: 34px;
+  }
+  
+  .hero-subtitle {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+  
+  .search-input-wrapper {
+    padding: 4px 4px 4px 15px;
+  }
+  
+  .search-input {
+    font-size: 14px;
+  }
+  
+  .search-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}

@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from 'react';
+import LandingPage from './pages/LandingPage/LandingPage';
+import './App.css';
 
 function App() {
-  const [message, setMessage] = useState('⏳ Waiting for backend...');
+  const [connectionStatus, setConnectionStatus] = useState('checking');
 
   useEffect(() => {
     fetch('/api/users')
       .then(response => {
         if (response.ok) {
-          setMessage('✅ Backend is connected successfully! (No users found yet, but connection works!)');
+          setConnectionStatus('connected');
         } else {
-          setMessage('⚠️ Backend responded, but with an error.');
+          setConnectionStatus('error');
         }
       })
-      .catch(error => {
-        setMessage('❌ Cannot reach backend. Make sure Spring Boot is running on port 8080!');
+      .catch(() => {
+        setConnectionStatus('disconnected');
       });
   }, []);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px', fontFamily: 'Arial' }}>
-      <h1>🎉 Event Management System</h1>
-      <h2 style={{ color: message.startsWith('✅') ? 'green' : 'red' }}>{message}</h2>
-      <p>Frontend is running on Port 3000</p>
-      <p>Backend should be running on Port 8080</p>
+    <div className="App">
+      <LandingPage />
+
+      {/* Floating Developer Backend Status Indicator */}
+      <div className={`backend-status-badge ${connectionStatus}`}>
+        <span className="status-dot"></span>
+        <span className="status-label">
+          {connectionStatus === 'checking' && 'Checking backend...'}
+          {connectionStatus === 'connected' && 'Backend Connected'}
+          {connectionStatus === 'error' && 'Backend API Error'}
+          {connectionStatus === 'disconnected' && 'Backend Disconnected (Port 8081)'}
+        </span>
+      </div>
     </div>
   );
 }

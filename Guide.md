@@ -83,7 +83,7 @@ Run the Backend (Spring Boot) using IntelliJ.
 * Click the **green play button (▶️)** at the top right.
 * Look at the bottom logs. Wait for the magic line: Started EventManagementSystemApplication in X seconds
 
-* **Leave this running.** The backend is now live on `http://localhost:8080`.
+* **Leave this running.** The backend is now live on `http://localhost:8081`.
 
 ---
 
@@ -125,7 +125,7 @@ Confirm Everything Works.
 | **`node` is not recognized** | You didn't install Node properly. Restart your terminal. |
 | **Backend crashes with "Database name must not be empty"** | You forgot to set the `MONGODB_URI` in IntelliJ. Go back to Step 5.2 and add it. |
 | **Frontend shows `⚠️ Backend responded, but with an error`** | Your backend is not running. Go back to IntelliJ and click the green play button to start it. |
-| **Port 8080 is already in use** | Close any other Java apps or restart your computer. |
+| **Port 8081 is already in use** | Close any other Java apps or restart your computer. |
 | **Port 3000 is already in use** | Press `Ctrl + C` in the terminal, type `Y` and press Enter. Then run `npm start` again. |
 
 ---

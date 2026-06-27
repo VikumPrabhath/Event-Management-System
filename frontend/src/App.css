@@ -1,38 +1,71 @@
+/* General app overrides */
 .App {
-  text-align: center;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
+  background-color: #fafafa;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Floating Developer Backend Status Indicator */
+.backend-status-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #eaeaea;
+  transition: all 0.3s ease;
 }
 
-.App-link {
-  color: #61dafb;
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Status States styling */
+.backend-status-badge.checking .status-dot {
+  background-color: #e2a100;
+  animation: pulse-dot 1.5s infinite;
+}
+.backend-status-badge.checking {
+  color: #c98e00;
+}
+
+.backend-status-badge.connected .status-dot {
+  background-color: #00b050;
+  box-shadow: 0 0 8px rgba(0, 176, 80, 0.5);
+}
+.backend-status-badge.connected {
+  color: #008f40;
+}
+
+.backend-status-badge.error .status-dot,
+.backend-status-badge.disconnected .status-dot {
+  background-color: #ea1d2c;
+  box-shadow: 0 0 8px rgba(234, 29, 44, 0.5);
+}
+.backend-status-badge.error,
+.backend-status-badge.disconnected {
+  color: #c4101e;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
 }
