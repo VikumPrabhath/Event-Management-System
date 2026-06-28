@@ -1,124 +1,560 @@
-.hero {
-  background: linear-gradient(135deg, #484b83, #5a5d9a);
+.hero-modern {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 100%);
+  padding: 70px 5% 90px 5%;
+  font-family: 'Inter', -apple-system, sans-serif;
+  text-align: left;
+  overflow: hidden;
+  transition: background 0.3s ease;
+}
+
+/* Dark Mode Hero Overrides */
+body.dark-theme .hero-modern {
+  background: linear-gradient(180deg, #000000 0%, #050505 100%);
+}
+body.dark-theme .hero-heading { color: #ffffff; }
+body.dark-theme .hero-description { color: #a0a0c0; }
+body.dark-theme .cta-secondary {
   color: #ffffff;
-  padding: 80px 20px;
-  text-align: center;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  display: flex;
-  justify-content: center;
+  border-color: rgba(255,255,255,0.2);
+}
+body.dark-theme .cta-secondary:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: #ff6a13;
+}
+body.dark-theme .badge-item { color: #8888aa; }
+
+.hero-modern-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 50px;
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
-.hero-content {
-  max-width: 800px;
+/* Realistic Trailing Sky Fireworks (Strictly behind cards) */
+.fireworks-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5; /* Reduced opacity as requested */
 }
 
-.hero-title {
-  font-size: 48px;
+.realistic-firework {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+}
+
+.spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 2px;
+}
+
+.spark::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  height: 40px;
+  border-radius: 4px;
+  transform-origin: bottom center;
+  animation: shoot 2s infinite ease-out;
+  opacity: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* Colors, Positions, and Varied Sizes for the Fireworks */
+.fw-1 {
+  top: 20%;
+  left: 10%;
+  color: #ffaf7b;
+  transform: scale(0.7); /* Small firework */
+}
+.fw-1 .spark::before {
+  background: linear-gradient(to top, transparent, #ffaf7b, #ff3b30);
+  animation-delay: 0s;
+  height: 50px;
+}
+
+.fw-2 {
+  bottom: 30%;
+  right: 10%;
+  color: #E94057;
+  transform: scale(1.3); /* Big firework */
+}
+.fw-2 .spark::before {
+  background: linear-gradient(to top, transparent, #E94057, #8A2387);
+  animation-delay: 1.2s;
+  height: 60px;
+}
+
+.fw-3 {
+  top: 40%;
+  right: 5%;
+  color: #00b4db;
+  transform: scale(0.9); /* Medium firework */
+}
+.fw-3 .spark::before {
+  background: linear-gradient(to top, transparent, #00b4db, #0083B0);
+  animation-delay: 0.8s;
+  height: 45px;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translateY(0) scaleY(0.1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-50px) scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scaleY(0.1);
+    opacity: 0;
+  }
+}
+
+/* Left Column Styling */
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hero-tag-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff0e6;
+  color: #ff6a13;
+  font-size: 12px;
   font-weight: 800;
-  margin-bottom: 16px;
-  letter-spacing: -1px;
-  line-height: 1.2;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  width: fit-content;
 }
 
-.hero-subtitle {
-  font-size: 20px;
-  opacity: 0.9;
-  margin-bottom: 40px;
-  font-weight: 400;
-  line-height: 1.5;
+body.dark-theme .hero-tag-pill {
+  background-color: rgba(255, 106, 19, 0.15);
 }
 
-.search-form {
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ff6a13;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ff6a13;
+}
+
+.hero-heading {
+  font-size: 52px;
+  font-weight: 800;
+  color: #1a1b4b;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin: 0;
+}
+
+.heading-highlight {
+  background: linear-gradient(135deg, #ff6a13, #e0560a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-description {
+  font-size: 17px;
+  color: #555570;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 500px;
+}
+
+.hero-actions {
   display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.search-input-wrapper {
-  display: flex;
+  gap: 16px;
   align-items: center;
-  background-color: #ffffff;
-  border-radius: 50px;
-  padding: 6px 6px 6px 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  width: 100%;
-  max-width: 600px;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  margin-top: 10px;
 }
 
-.search-input-wrapper:focus-within {
-  box-shadow: 0 10px 30px rgba(255, 106, 19, 0.25);
+.cta-primary {
+  background-color: #ff6a13;
+  color: #ffffff;
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(255, 106, 19, 0.3);
+  transition: all 0.2s ease;
+}
+
+.cta-primary:hover {
+  background-color: #e0560a;
   transform: translateY(-2px);
 }
 
-.search-icon {
-  font-size: 18px;
-  margin-right: 12px;
-  color: #8c8c8c;
+.cta-secondary {
+  background: transparent;
+  color: #1a1b4b;
+  border: 1px solid #dcdce2;
+  padding: 13px 24px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
 }
 
-.search-input {
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #1a1b4b;
-  width: 100%;
-  font-weight: 500;
+.cta-secondary:hover {
+  border-color: #ff6a13;
+  color: #ff6a13;
+  background-color: #fff8f3;
 }
 
-.search-input::placeholder {
-  color: #ababab;
+.play-icon {
+  color: #ff6a13;
+  font-size: 11px;
 }
 
-.search-btn {
-  background-color: #ff6a13;
-  color: #ffffff;
-  border: none;
-  padding: 14px 36px;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 40px;
+.trust-badges {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+  padding-top: 20px;
+  border-top: 1px solid #eaebf0;
+  flex-wrap: wrap;
+}
+
+body.dark-theme .trust-badges {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.badge-item {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666680;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Right Column: Exact 3D Card Stack Showcase */
+.hero-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  perspective: 1000px;
+}
+
+.exact-3d-stack-wrapper {
+  position: relative;
+  width: 380px;
+  height: 490px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dynamic Ambient Glowing Fluid Shape under the cards */
+.ambient-glow-shape {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  background: linear-gradient(135deg, rgba(255, 106, 19, 0.35), rgba(138, 35, 135, 0.35));
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  filter: blur(45px);
+  z-index: 0;
+  animation: morph-glow 8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Background Card Tilted Behind */
+.stack-3d-bg-card {
+  position: absolute;
+  top: 15px;
+  right: -25px;
+  width: 370px;
+  height: 460px;
+  background-color: #ffffff;
+  border-radius: 28px;
+  transform: rotate(8deg) translate(10px, -10px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eaeaea;
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0.8;
+  transition: all 0.5s ease;
+}
+
+body.dark-theme .stack-3d-bg-card {
+  background-color: #111111;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.bg-poster-area {
+  height: 280px;
+  margin: 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-icon {
+  font-size: 50px;
+  opacity: 0.5;
+}
+
+/* Foreground Main Card (Distinctly Tilted & Animated) */
+.stack-3d-fg-card {
+  position: relative;
+  width: 370px;
+  background-color: #ffffff;
+  border-radius: 28px;
+  transform: rotate(-2deg);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  z-index: 2;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.search-btn:hover {
-  background-color: #e0560a;
+body.dark-theme .stack-3d-fg-card {
+  background-color: #0a0a0a;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
 }
 
-.search-btn:active {
-  transform: scale(0.97);
+.stack-3d-fg-card:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.02);
 }
 
-/* Responsiveness */
-@media (max-width: 768px) {
-  .hero {
-    padding: 60px 20px;
+/* Dramatic 3D Card Swap Keyframe Animation */
+.card-swap-anim {
+  animation: big-card-swap-3d 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fg-poster-area {
+  height: 280px;
+  margin: 14px;
+  border-radius: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fg-icon {
+  font-size: 56px;
+}
+
+/* Exact Pop-out Countdown Badge on Image Border */
+.exact-popout-countdown {
+  position: absolute;
+  bottom: -16px;
+  left: 12px;
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  border: 1px solid #f0f0f4;
+}
+
+body.dark-theme .exact-popout-countdown {
+  background-color: #111111;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.orange-clock-circle {
+  font-size: 16px;
+  background: #ff6a13;
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-labels {
+  display: flex;
+  flex-direction: column;
+}
+
+.countdown-labels label {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #999;
+  letter-spacing: 0.5px;
+}
+
+.countdown-labels strong {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1a1b4b;
+}
+
+body.dark-theme .countdown-labels strong {
+  color: #ffffff;
+}
+
+/* Dashed Separator */
+.card-dashed-divider {
+  margin: 18px 20px 0 20px;
+  border-top: 1px dashed #e2e2e8;
+}
+
+body.dark-theme .card-dashed-divider {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Card Body */
+.fg-card-body {
+  padding: 16px 20px 24px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.body-left-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.fg-date {
+  font-size: 10px;
+  font-weight: 800;
+  color: #8888a0;
+  letter-spacing: 0.5px;
+}
+
+.fg-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a1b4b;
+  margin: 3px 0 2px 0;
+  line-height: 1.3;
+  max-width: 170px;
+}
+
+body.dark-theme .fg-title {
+  color: #ffffff;
+}
+
+.fg-doors {
+  font-size: 12px;
+  color: #777;
+}
+
+body.dark-theme .fg-doors {
+  color: #aaa;
+}
+
+.body-right-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.body-right-price label {
+  font-size: 9px;
+  font-weight: 800;
+  color: #999;
+}
+
+.fg-price-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1b4b;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+body.dark-theme .fg-price-val {
+  color: #ffffff;
+}
+
+/* Exact Pop-out Corner Badge at Bottom Right */
+.exact-popout-trending-badge {
+  position: absolute;
+  bottom: -12px;
+  right: 14px;
+  background: linear-gradient(135deg, #ff6a13, #ff3b30);
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(255, 106, 19, 0.4);
+  z-index: 10;
+  transform: rotate(-3deg);
+}
+
+/* Dramatic 3D Swap Keyframe Animation */
+@keyframes big-card-swap-3d {
+  0% {
+    transform: rotate(-15deg) translateY(-40px) scale(0.85);
+    opacity: 0.4;
   }
-  
-  .hero-title {
-    font-size: 34px;
+  50% {
+    transform: rotate(10deg) translateY(15px) scale(1.05);
   }
-  
-  .hero-subtitle {
-    font-size: 16px;
-    margin-bottom: 30px;
+  100% {
+    transform: rotate(-2deg) translateY(0) scale(1);
+    opacity: 1;
   }
-  
-  .search-input-wrapper {
-    padding: 4px 4px 4px 15px;
+}
+
+/* Fluid Morphing Ambient Glow */
+@keyframes morph-glow {
+  0% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    transform: scale(0.9) rotate(0deg);
+    opacity: 0.5;
   }
-  
-  .search-input {
-    font-size: 14px;
+  50% {
+    border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%;
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.8;
   }
-  
-  .search-btn {
-    padding: 10px 20px;
-    font-size: 14px;
+  100% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    transform: scale(0.9) rotate(360deg);
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-modern-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hero-heading {
+    font-size: 38px;
   }
 }

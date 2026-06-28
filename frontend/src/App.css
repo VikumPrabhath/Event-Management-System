@@ -8,6 +8,17 @@
 body {
   margin: 0;
   background-color: #fafafa;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-theme {
+  background-color: #000000;
+  color: #e8e8f5;
+}
+
+.App.dark-theme {
+  background-color: #000000;
+  color: #e8e8f5;
 }
 
 /* Floating Developer Backend Status Indicator */

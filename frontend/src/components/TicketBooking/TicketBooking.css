@@ -1,0 +1,256 @@
+.booking-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 16, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.booking-modal-content {
+  background: #ffffff;
+  width: 90%;
+  max-width: 520px;
+  border-radius: 24px;
+  padding: 35px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  animation: modal-pop 0.3s ease-out;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #f0f0f0;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.close-modal-btn:hover {
+  background: #ff6a13;
+  color: #fff;
+}
+
+.modal-header-tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+.step-tab {
+  font-size: 14px;
+  font-weight: 700;
+  color: #aaa;
+}
+
+.step-tab.active {
+  color: #ff6a13;
+}
+
+.step-arrow {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.step-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1b4b;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444;
+}
+
+.modal-select, .form-group input {
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.modal-select:focus, .form-group input:focus {
+  border-color: #ff6a13;
+}
+
+.quantity-counter {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #f7f7f9;
+  width: fit-content;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.quantity-counter button {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.quantity-counter span {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1b4b;
+}
+
+.price-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff8f3;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid #ffe4d1;
+  margin: 25px 0;
+  font-size: 16px;
+}
+
+.total-price-text {
+  font-size: 20px;
+  color: #ff6a13;
+}
+
+.next-step-btn, .confirm-pay-btn {
+  width: 100%;
+  background: #ff6a13;
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 106, 19, 0.3);
+  transition: background 0.2s;
+}
+
+.next-step-btn:hover, .confirm-pay-btn:hover {
+  background: #e0560a;
+}
+
+.form-row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.payment-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pay-card {
+  border: 2px solid #eee;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.pay-card.selected {
+  border-color: #ff6a13;
+  background: #fff8f3;
+  color: #ff6a13;
+}
+
+.checkout-footer {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.back-step-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 30px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.booking-success-view {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.ticket-summary-box {
+  background: #f9f9fc;
+  padding: 20px;
+  border-radius: 16px;
+  margin: 20px 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.ticket-summary-box span { color: #666; }
+
+.done-btn {
+  background: #1a1b4b;
+  color: #ffffff;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

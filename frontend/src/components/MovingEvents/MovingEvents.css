@@ -1,0 +1,181 @@
+.moving-events-section {
+  background-color: #262758;
+  padding: 35px 0 45px 0;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, sans-serif;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.section-header-ticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.live-pulse {
+  width: 10px;
+  height: 10px;
+  background-color: #ff3b30;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ff3b30;
+  animation: live-pulse-anim 1.5s infinite;
+}
+
+.ticker-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ff8c42;
+  margin: 0;
+}
+
+.marquee-wrapper {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+.marquee-wrapper::before,
+.marquee-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.marquee-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, #262758, transparent);
+}
+
+.marquee-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, #262758, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.moving-card {
+  width: 290px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: #1a1b4b;
+  text-align: left;
+}
+
+.moving-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(255, 106, 19, 0.3);
+}
+
+.moving-card-banner {
+  height: 110px;
+  position: relative;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.moving-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.badge-hot { background-color: #ff3b30; }
+.badge-fast { background-color: #ff9500; }
+.badge-instant { background-color: #34c759; color: #000; }
+.badge-popular { background-color: #5856d6; }
+
+.moving-card-icon {
+  font-size: 32px;
+  opacity: 0.85;
+}
+
+.moving-card-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.moving-event-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #1a1b4b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.moving-event-venue {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.moving-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+.moving-event-date {
+  font-weight: 600;
+  color: #555;
+}
+
+.moving-event-price {
+  font-weight: 800;
+  color: #ff6a13;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes live-pulse-anim {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}

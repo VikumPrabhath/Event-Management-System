@@ -1,0 +1,38 @@
+.admin-stats-page-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  width: 90%;
+  font-family: 'Inter', sans-serif;
+  flex: 1;
+}
+
+.stats-header-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.pie-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: -20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1b4b;
+}
+
+body.dark-theme .legend-item { color: #fff; }
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}

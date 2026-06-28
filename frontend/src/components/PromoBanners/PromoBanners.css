@@ -1,0 +1,215 @@
+.promo-banners-section {
+  padding: 50px 5%;
+  background-color: #ffffff;
+  font-family: 'Inter', -apple-system, sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-theme .promo-banners-section {
+  background-color: #000000;
+}
+
+body.dark-theme .promo-section-title {
+  color: #ffffff;
+}
+
+.promo-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.promo-section-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1b4b;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fire-icon {
+  font-size: 22px;
+}
+
+.banners-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+/* Large Main Banner */
+.large-promo-banner {
+  background: linear-gradient(135deg, #18193d, #32356d);
+  border-radius: 24px;
+  padding: 35px;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 280px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: left;
+}
+
+.large-promo-banner:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 45px rgba(255, 106, 19, 0.25);
+}
+
+.large-promo-banner::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(255,106,19,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.banner-badge {
+  position: absolute;
+  top: 25px;
+  left: 35px;
+  background-color: #ff6a13;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
+.banner-content-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2;
+}
+
+.banner-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff8c42;
+  letter-spacing: 0.5px;
+}
+
+.banner-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.banner-sub {
+  font-size: 14px;
+  color: #d0d0e0;
+  margin: 0 0 15px 0;
+  max-width: 500px;
+}
+
+.banner-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.banner-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #eee;
+}
+
+.banner-btn {
+  background-color: #ff6a13;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.banner-btn:hover {
+  background-color: #e0560a;
+}
+
+/* Small Banners Column */
+.small-banners-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.small-promo-banner {
+  border-radius: 20px;
+  padding: 22px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  text-align: left;
+  position: relative;
+}
+
+.small-promo-banner:hover {
+  transform: translateY(-3px);
+}
+
+.banner-sports {
+  background: linear-gradient(135deg, #0f2027, #203a43);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.banner-theatre {
+  background: linear-gradient(135deg, #3a1c71, #472b74);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.small-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #00b4db;
+  letter-spacing: 0.5px;
+}
+
+.badge-purple {
+  color: #ffaf7b;
+}
+
+.small-promo-banner h4 {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.small-promo-banner p {
+  font-size: 12px;
+  color: #ccc;
+  margin: 0 0 10px 0;
+}
+
+.small-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ff6a13;
+}
+
+@media (max-width: 900px) {
+  .banners-grid {
+    grid-template-columns: 1fr;
+  }
+}

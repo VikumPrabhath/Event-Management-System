@@ -42,6 +42,41 @@
   color: #ff6a13; /* bright orange */
 }
 
+/* Integrated Header Search Form */
+.header-search-form {
+  display: flex;
+  align-items: center;
+  background-color: #f4f4f6;
+  border-radius: 24px;
+  padding: 8px 16px;
+  width: 280px;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e5e8;
+}
+
+.header-search-form:focus-within {
+  background-color: #ffffff;
+  border-color: #ff6a13;
+  box-shadow: 0 4px 12px rgba(255, 106, 19, 0.15);
+  width: 320px;
+}
+
+.header-search-icon {
+  font-size: 14px;
+  margin-right: 8px;
+  color: #888;
+}
+
+.header-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1a1b4b;
+  width: 100%;
+}
+
 .nav-menu {
   display: flex;
   gap: 32px;
@@ -63,6 +98,90 @@
 .cta-container {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle-btn {
+  background: #f0f0f4;
+  border: 1px solid #dcdce2;
+  color: #1a1b4b;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: #e2e2e8;
+  transform: translateY(-1px);
+}
+
+/* Dark Mode Header Overrides */
+.header.dark-header {
+  background-color: #000000;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+}
+
+.dark-header .logo-sell { color: #ffffff; }
+.dark-header .nav-link { color: #e0e0f0; }
+.dark-header .nav-link:hover { color: #ff6a13; }
+.dark-header .header-search-form {
+  background-color: #111111;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark-header .header-search-input { color: #ffffff; }
+.dark-header .theme-toggle-btn {
+  background: #111111;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffaf7b;
+}
+
+/* Admin Header Styles */
+.admin-header-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1b4b;
+  flex: 1;
+  text-align: center;
+}
+
+.dark-header .admin-header-title {
+  color: #ffffff;
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-avatar {
+  background: #ff6a13;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.admin-welcome {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1b4b;
+}
+
+.dark-header .admin-welcome {
+  color: #e0e0f0;
+}
+
+.admin-theme-btn {
+  margin-left: 10px;
 }
 
 .book-ticket-btn {
