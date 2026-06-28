@@ -1,0 +1,62 @@
+.map-widget-card {
+  background: #12131a;
+  border: 1px solid #232533;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.map-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.map-header .map-icon {
+  font-size: 20px;
+}
+
+.map-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.map-frame-wrapper {
+  overflow: hidden;
+  border-radius: 12px;
+  background: #191b26;
+}
+
+.map-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  gap: 16px;
+}
+
+.venue-text {
+  font-size: 13px;
+  color: #a0a5b5;
+  font-weight: 500;
+}
+
+.directions-btn {
+  background: #ff6a13;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.directions-btn:hover {
+  background: #e0560a;
+}

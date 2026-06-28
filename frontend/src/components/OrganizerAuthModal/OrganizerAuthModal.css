@@ -1,0 +1,136 @@
+.org-auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  animation: fadeIn 0.2s ease;
+}
+
+.org-auth-content {
+  background: #0f1017;
+  border: 1px solid #232533;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 440px;
+  padding: 34px;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+}
+
+.org-auth-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: transparent;
+  border: none;
+  font-size: 26px;
+  color: #8b90a0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.org-auth-close:hover {
+  color: #ffffff;
+}
+
+.org-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.org-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+}
+
+.org-header p {
+  font-size: 13px;
+  color: #8b90a0;
+  margin: 0;
+}
+
+.org-tabs {
+  display: flex;
+  background: #171924;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.org-tab {
+  flex: 1;
+  padding: 11px;
+  background: transparent;
+  border: none;
+  color: #8b90a0;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.org-tab.active {
+  background: linear-gradient(135deg, #ff6a13, #ff9f43);
+  color: #ffffff;
+}
+
+.org-form .form-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.org-form label {
+  display: block;
+  font-size: 13px;
+  color: #a0a5b5;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.org-form input {
+  width: 100%;
+  padding: 12px 14px;
+  background: #171924;
+  border: 1px solid #282a3c;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.org-form input:focus {
+  border-color: #ff6a13;
+}
+
+.org-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #ff6a13, #e0560a);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 6px 20px rgba(255, 106, 19, 0.4);
+  transition: transform 0.1s, filter 0.2s;
+}
+
+.org-submit-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}

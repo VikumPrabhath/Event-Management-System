@@ -7,12 +7,12 @@ import TypeBannersSection from '../../components/TypeBannersSection/TypeBannersS
 import Footer from '../../components/Footer/Footer';
 import './LandingPage.css';
 
-function LandingPage({ onSelectEvent, theme, toggleTheme }) {
+function LandingPage({ onSelectEvent, theme, toggleTheme, user, onOpenAuth, onOpenOrganizerAuth }) {
   return (
     <div className={`landing-page ${theme}-mode`}>
-      <Header theme={theme} toggleTheme={toggleTheme} />
+      <Header theme={theme} toggleTheme={toggleTheme} user={user} onOpenAuth={onOpenAuth} />
       <main className="main-content">
-        <Hero onSelectEvent={onSelectEvent} />
+        <Hero onSelectEvent={onSelectEvent} onOpenAuth={onOpenAuth} onOpenOrganizerAuth={onOpenOrganizerAuth} />
         <TypeBannersSection onSelectEvent={onSelectEvent} />
         <PromoBanners onSelectEvent={onSelectEvent} />
         <EventSection onSelectEvent={onSelectEvent} />

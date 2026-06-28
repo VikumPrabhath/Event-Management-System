@@ -231,6 +231,24 @@ body.dark-theme .hero-tag-pill {
   background-color: #fff8f3;
 }
 
+.cta-organizer {
+  background: linear-gradient(135deg, #6c5ce7, #8e44ad);
+  color: #ffffff;
+  border: none;
+  padding: 14px 26px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+  transition: all 0.2s ease;
+}
+
+.cta-organizer:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
 .play-icon {
   color: #ff6a13;
   font-size: 11px;
@@ -352,7 +370,7 @@ body.dark-theme .stack-3d-fg-card {
 
 /* Dramatic 3D Card Swap Keyframe Animation */
 .card-swap-anim {
-  animation: big-card-swap-3d 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: big-card-swap-3d 0.85s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .fg-poster-area {
@@ -515,18 +533,25 @@ body.dark-theme .fg-price-val {
   transform: rotate(-3deg);
 }
 
-/* Dramatic 3D Swap Keyframe Animation */
+/* Silky Smooth 3D Swap Keyframe Animation */
 @keyframes big-card-swap-3d {
   0% {
-    transform: rotate(-15deg) translateY(-40px) scale(0.85);
-    opacity: 0.4;
+    transform: perspective(1000px) rotateY(-25deg) rotateZ(-10deg) translateX(80px) translateY(-30px) scale(0.9);
+    opacity: 0.2;
+    filter: blur(4px);
   }
-  50% {
-    transform: rotate(10deg) translateY(15px) scale(1.05);
+  45% {
+    transform: perspective(1000px) rotateY(15deg) rotateZ(5deg) translateX(-20px) translateY(-10px) scale(1.04);
+    opacity: 0.9;
+    filter: blur(0px);
+  }
+  75% {
+    transform: perspective(1000px) rotateY(-5deg) rotateZ(-3deg) translateX(5px) translateY(2px) scale(1.01);
   }
   100% {
-    transform: rotate(-2deg) translateY(0) scale(1);
+    transform: perspective(1000px) rotateY(0deg) rotateZ(-2deg) translateX(0) translateY(0) scale(1);
     opacity: 1;
+    filter: blur(0px);
   }
 }
 

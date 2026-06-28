@@ -1,5 +1,6 @@
 package com.eventmanagement.controller;
 
+import com.eventmanagement.dto.LoginRequest;
 import com.eventmanagement.dto.RegisterRequest;
 import com.eventmanagement.entity.User;
 import com.eventmanagement.service.UserService;
@@ -26,6 +27,17 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // User Login
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request) {
+        try {
+            User loggedInUser = userService.loginUser(request);
+            return ResponseEntity.ok(loggedInUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 

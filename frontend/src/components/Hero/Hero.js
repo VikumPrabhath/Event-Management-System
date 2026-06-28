@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Hero.css';
 
-function Hero({ onSelectEvent }) {
+function Hero({ onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
   // Exact 3D Card Stack Dataset matching the reference image
   const stackEvents = [
     {
@@ -70,10 +70,13 @@ function Hero({ onSelectEvent }) {
 
           <div className="hero-actions">
             <a href="#events-grid-section" className="cta-primary">
-              Explore All Events &rsaquo;
+              Explore All Events
             </a>
             <button className="cta-secondary" onClick={() => onSelectEvent && onSelectEvent(activeCard)}>
-              <span className="play-icon">▶</span> View Featured
+              View Featured
+            </button>
+            <button className="cta-organizer" onClick={onOpenOrganizerAuth || onOpenAuth}>
+              Publish or Organize Event
             </button>
           </div>
 

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import EventsMegaMenu from '../EventsMegaMenu/EventsMegaMenu';
 import './Header.css';
 
-function Header({ onSearch, theme, toggleTheme, isAdminView }) {
+function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
   const [imgError, setImgError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showMegaMenu, setShowMegaMenu] = useState(false);
 
   const handleLogoError = () => {
     setImgError(true);
@@ -16,7 +18,7 @@ function Header({ onSearch, theme, toggleTheme, isAdminView }) {
   };
 
   return (
-    <header className={`header ${theme === 'dark' ? 'dark-header' : ''}`}>
+    <header className={`header ${theme === 'dark' ? 'dark-header' : ''}`} style={{position: 'relative'}}>
       <div className="logo-container">
         <Link to="/" style={{ textDecoration: 'none' }}>
           {imgError ? (
@@ -50,16 +52,39 @@ function Header({ onSearch, theme, toggleTheme, isAdminView }) {
           </form>
           
           <nav className="nav-menu">
+            <button 
+              className="nav-link nav-dropdown-trigger" 
+              onClick={() => setShowMegaMenu(!showMegaMenu)}
+              style={{background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit'}}
+            >
+              Events {showMegaMenu ? '⌃' : '▾'}
+            </button>
             <a href="#concerts" className="nav-link">Concerts</a>
             <a href="#theater" className="nav-link">Theater</a>
-            <Link to="/admin" className="nav-link">Login</Link>
+            {user ? (
+              <Link to="/dashboard" className="nav-link user-dash-link">
+                My Dashboard
+              </Link>
+            ) : (
+              <button onClick={onOpenAuth} className="nav-link nav-auth-btn">
+                Sign In / Register
+              </button>
+            )}
           </nav>
 
           <div className="cta-container">
             <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle Dark/Light Mode">
-              {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+              {theme === 'dark' ? 'Light' : 'Dark'}
             </button>
-            <button className="book-ticket-btn">Book Ticket</button>
+            {user ? (
+              <Link to="/dashboard" className="book-ticket-btn" style={{textDecoration: 'none'}}>
+                My Tickets
+              </Link>
+            ) : (
+              <button className="book-ticket-btn" onClick={onOpenAuth}>
+                Book Ticket
+              </button>
+            )}
           </div>
         </>
       ) : (
@@ -74,6 +99,7 @@ function Header({ onSearch, theme, toggleTheme, isAdminView }) {
           </div>
         </>
       )}
+      <EventsMegaMenu isOpen={showMegaMenu} onClose={() => setShowMegaMenu(false)} />
     </header>
   );
 }

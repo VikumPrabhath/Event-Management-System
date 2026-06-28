@@ -1,0 +1,125 @@
+.mega-menu-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding-top: 10px;
+  animation: fadeIn 0.2s ease;
+}
+
+.mega-menu-container {
+  background: #111218;
+  border: 1px solid #232533;
+  border-radius: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  min-height: 480px;
+}
+
+.mega-menu-sidebar {
+  width: 260px;
+  background: #161822;
+  border-right: 1px solid #232533;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 520px;
+}
+
+.sidebar-item {
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: #a0a5b5;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.sidebar-item.active {
+  background: #232533;
+  color: #ffffff;
+}
+
+.mega-menu-content {
+  flex: 1;
+  padding: 30px;
+  background: #0f1015;
+}
+
+.mega-content-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+
+.events-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.mini-event-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #171922;
+  border: 1px solid #232533;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.mini-event-card:hover {
+  transform: translateY(-2px);
+  border-color: #ff6a13;
+}
+
+.mini-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.mini-details {
+  flex: 1;
+  overflow: hidden;
+}
+
+.mini-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-meta {
+  font-size: 11px;
+  color: #8b90a0;
+  margin: 0;
+  font-weight: 600;
+}

@@ -1,0 +1,252 @@
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.auth-modal-content {
+  background: #12131a;
+  border: 1px solid #2a2d3d;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  transition: max-width 0.25s ease;
+}
+
+.auth-modal-content.wide-modal {
+  max-width: 540px;
+}
+
+.form-row-two {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row-two .form-group {
+  flex: 1;
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #8b90a0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.auth-modal-close:hover {
+  color: #ffffff;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #1a1c29;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #8b90a0;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  background: #6c5ce7;
+  color: #ffffff;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  color: #12131a;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.google-btn:hover {
+  background: #f1f1f1;
+  transform: translateY(-1px);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #55596e;
+  font-size: 13px;
+}
+
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #2a2d3d;
+}
+
+.auth-divider span {
+  padding: 0 10px;
+}
+
+.auth-form .form-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.auth-form label {
+  display: block;
+  font-size: 13px;
+  color: #a0a5b5;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  background: #1a1c29;
+  border: 1px solid #2a2d3d;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.auth-form input:focus {
+  border-color: #6c5ce7;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #6c5ce7, #8e44ad);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+  transition: filter 0.2s, transform 0.1s;
+}
+
+.auth-submit-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Google Simulation Box */
+.google-sim-box {
+  text-align: center;
+}
+
+.google-sim-header svg {
+  margin-bottom: 10px;
+}
+
+.google-sim-header h3 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+}
+
+.google-sim-header p {
+  color: #8b90a0;
+  font-size: 13px;
+  margin: 0 0 20px 0;
+}
+
+.google-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.google-account-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #1a1c29;
+  border: 1px solid #2a2d3d;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.google-account-item:hover {
+  background: #222536;
+  border-color: #6c5ce7;
+}
+
+.google-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #4285F4;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.google-account-info {
+  flex: 1;
+}
+
+.google-account-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.google-account-email {
+  font-size: 12px;
+  color: #8b90a0;
+}
+
+.google-sim-cancel {
+  background: transparent;
+  border: none;
+  color: #8b90a0;
+  cursor: pointer;
+  font-size: 14px;
+}

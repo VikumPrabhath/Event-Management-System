@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
+import MapWidget from '../../components/MapWidget/MapWidget';
 import './EventDetails.css';
 
-function EventDetails({ event, onBack, onOpenBooking }) {
+function EventDetails({ event, onBack, onOpenBooking, theme, toggleTheme, user, onOpenAuth }) {
   const defaultDetails = {
-    title: 'AARADHANA BY WAYO',
-    date: '25, November 2026',
-    time: '6:30 PM Onwards',
-    venue: 'Viharamahadevi Outdoor Stage, Colombo',
-    organizer: 'Wayo Production (Pvt) Ltd',
-    description: 'Experience an unforgettable musical evening with WAYO live in concert! Featuring exclusive live arrangements, energetic band performances, and special guest appearances.'
+    title: 'ANAGATHAYE BY WAYOO',
+    type: 'Indoor live in concert',
+    artistLineup: 'Athma Liyanage | Amal Perera | Namal Udugama | BNS',
+    musicBy: 'WAYO',
+    date: '2026-07-17 19:00:00',
+    venue: 'Musaeus College Auditorium',
+    organizer: 'Asipiya Entertainment'
   };
 
   const currentEvent = event || defaultDetails;
 
-  // Countdown state simulation
-  const [timeLeft, setTimeLeft] = useState({ days: 22, hours: 12, minutes: 35, seconds: 14 });
+  const [timeLeft, setTimeLeft] = useState({ days: 25, hours: 12, minutes: 54, seconds: 15 });
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,39 +30,54 @@ function EventDetails({ event, onBack, onOpenBooking }) {
   }, []);
 
   const ticketTiers = [
-    { name: 'Balcony / General', price: 'LKR 2,000', available: true },
-    { name: 'Standard Seating', price: 'LKR 3,500', available: true },
-    { name: 'VIP Front Row', price: 'LKR 5,000', available: true }
+    { name: 'Balcony', price: '4000.00 LKR' },
+    { name: 'Silver', price: '6000.00 LKR' },
+    { name: 'Gold', price: '7500.00 LKR' },
+    { name: 'Platinum', price: '10000.00 LKR' },
+    { name: 'VIP', price: '15000.00 LKR' }
   ];
 
   return (
-    <div className="event-details-page">
-      <Header />
+    <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`}>
+      <Header theme={theme} toggleTheme={toggleTheme} user={user} onOpenAuth={onOpenAuth} />
 
-      {/* Hero Banner with Countdown */}
-      <div className="event-hero-banner">
-        <div className="event-hero-container">
-          <button className="back-btn" onClick={onBack}>← Back to Events</button>
-          
-          <div className="banner-content">
-            <div className="banner-poster-placeholder">
-              <div className="poster-icon">🎤</div>
-              <span>Event Poster</span>
+      {/* Top Banner & Floating Poster Section */}
+      <div className="details-hero-section">
+        <div className="hero-cover-bg">
+          <div className="cover-overlay"></div>
+          {/* Overlapping Square Poster Card on right */}
+          <div className="floating-poster-card">
+            <div className="poster-inner-img">
+              <span className="poster-title-preview">{currentEvent.title}</span>
             </div>
+          </div>
+        </div>
 
-            <div className="banner-timer-box">
-              <h3>Event will start in</h3>
-              <div className="countdown-display">
-                <div className="timer-unit"><span>{timeLeft.days}</span><label>Days</label></div>
-                <div className="timer-colon">:</div>
-                <div className="timer-unit"><span>{timeLeft.hours}</span><label>Hours</label></div>
-                <div className="timer-colon">:</div>
-                <div className="timer-unit"><span>{timeLeft.minutes}</span><label>Mins</label></div>
-                <div className="timer-colon">:</div>
-                <div className="timer-unit"><span>{timeLeft.seconds}</span><label>Secs</label></div>
+        {/* Left Countdown Bar underneath hero cover */}
+        <div className="countdown-bar-wrapper">
+          <div className="countdown-bar-container">
+            <div className="bar-left-content">
+              <h3 className="countdown-headline">Event <span className="light-sub">will start on</span></h3>
+              <div className="countdown-boxes">
+                <div className="time-box">
+                  <span className="num">{timeLeft.days}</span>
+                  <label>DAYS</label>
+                </div>
+                <div className="time-box">
+                  <span className="num">{timeLeft.hours}</span>
+                  <label>HOURS</label>
+                </div>
+                <div className="time-box">
+                  <span className="num">{timeLeft.minutes}</span>
+                  <label>MINS</label>
+                </div>
+                <div className="time-box">
+                  <span className="num">{timeLeft.seconds}</span>
+                  <label>SECS</label>
+                </div>
               </div>
-              <button className="hero-buy-btn" onClick={() => onOpenBooking(currentEvent)}>
-                Buy Ticket Now
+              <button className="orange-book-now-btn" onClick={() => onOpenBooking(currentEvent)}>
+                Book Now
               </button>
             </div>
           </div>
@@ -69,56 +85,53 @@ function EventDetails({ event, onBack, onOpenBooking }) {
       </div>
 
       {/* Main Details Body */}
-      <div className="event-body-container">
-        <div className="details-left">
-          <h1 className="details-title">{currentEvent.title}</h1>
-          
-          <div className="info-grid">
-            <div className="info-item">
-              <span className="info-icon">📅</span>
-              <div>
-                <strong>Date & Time</strong>
-                <p>{currentEvent.date} • {currentEvent.time}</p>
+      <div className="details-main-body">
+        <div className="body-grid-container">
+          {/* Left Column Info */}
+          <div className="main-info-column">
+            <h1 className="event-main-title">{currentEvent.title}</h1>
+            <p className="event-subtitle">{currentEvent.type || defaultDetails.type}</p>
+
+            <div className="lineup-box">
+              <strong>Artist line up</strong>
+              <p>{currentEvent.artistLineup || defaultDetails.artistLineup}</p>
+              <p className="music-by">Music by {currentEvent.musicBy || defaultDetails.musicBy}</p>
+            </div>
+
+            <div className="event-meta-list">
+              <div className="meta-row">
+                <span className="meta-bullet">📅</span>
+                <span>{currentEvent.date}</span>
+              </div>
+              <div className="meta-row">
+                <span className="meta-bullet">📍</span>
+                <span>{currentEvent.venue || defaultDetails.venue}</span>
+              </div>
+              <div className="meta-row">
+                <span className="meta-bullet">Organized by</span>
+                <span>{currentEvent.organizer || defaultDetails.organizer}</span>
               </div>
             </div>
-            <div className="info-item">
-              <span className="info-icon">📍</span>
-              <div>
-                <strong>Location / Venue</strong>
-                <p>{currentEvent.venue || currentEvent.category}</p>
-              </div>
-            </div>
-            <div className="info-item">
-              <span className="info-icon">🏢</span>
-              <div>
-                <strong>Organized By</strong>
-                <p>{currentEvent.organizer || 'Sellout Official Partners'}</p>
-              </div>
-            </div>
+
+            {/* Map Widget embedded cleanly */}
+            <MapWidget venue={currentEvent.venue || defaultDetails.venue} />
           </div>
 
-          <div className="about-section">
-            <h3>About This Event</h3>
-            <p>{currentEvent.description || defaultDetails.description}</p>
-          </div>
-        </div>
-
-        {/* Right Side Ticket Prices */}
-        <div className="details-right">
-          <div className="ticket-prices-card">
-            <h3>Ticket Categories</h3>
-            <div className="tiers-list">
-              {ticketTiers.map((tier, idx) => (
-                <div key={idx} className="tier-row">
-                  <div className="tier-info">
-                    <span className="tier-name">{tier.name}</span>
-                    <span className="tier-price">{tier.price}</span>
+          {/* Right Column Ticket Prices */}
+          <div className="prices-sidebar-column">
+            <div className="ticket-prices-card">
+              <h2 className="prices-card-title">Ticket <span className="light-sub">Prices</span></h2>
+              <div className="tiers-table">
+                {ticketTiers.map((tier, idx) => (
+                  <div key={idx} className="tier-item-row">
+                    <span className="tier-name-label">{tier.name}</span>
+                    <span className="tier-price-value">{tier.price}</span>
                   </div>
-                  <button className="tier-buy-btn" onClick={() => onOpenBooking({ ...currentEvent, selectedTier: tier })}>
-                    Buy Ticket
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
+              <button className="buy-tickets-orange-btn" onClick={() => onOpenBooking(currentEvent)}>
+                Buy Tickets &gt;&gt;
+              </button>
             </div>
           </div>
         </div>
