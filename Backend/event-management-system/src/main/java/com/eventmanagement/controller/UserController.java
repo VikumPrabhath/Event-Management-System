@@ -30,17 +30,6 @@ public class UserController {
         }
     }
 
-    // User Login
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest request) {
-        try {
-            User loggedInUser = userService.loginUser(request);
-            return ResponseEntity.ok(loggedInUser);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-    }
-
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();

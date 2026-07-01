@@ -33,8 +33,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/status").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(httpBasic -> httpBasic.disable());
         return http.build();
     }
 

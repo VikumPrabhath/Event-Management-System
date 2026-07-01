@@ -77,7 +77,7 @@ function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         const payload = { email, password };
         let res;
         try {
-          res = await fetch('http://localhost:8081/api/users/login', {
+          res = await fetch('http://localhost:8081/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
