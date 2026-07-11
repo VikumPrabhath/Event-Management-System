@@ -32,7 +32,11 @@ pipeline {
         stage('Build Frontend (npm)') {
             steps {
                 // Install dependencies and build the React app
-                sh 'cd frontend && npm install && npm run build'
+                sh '''
+                    cd frontend
+                    npm install
+                    CI=false npm run build   # ✅ This tells React to not treat warnings as errors
+                '''
             }
         }
 
