@@ -21,7 +21,11 @@ pipeline {
         stage('Build Backend (Maven)') {
             steps {
                 // Navigate to backend, skip tests for now (to save time)
-                sh 'cd Backend/event-management-system && ./mvnw clean package -DskipTests'
+                sh '''
+                    cd Backend/event-management-system
+                    chmod +x mvnw
+                    ./mvnw clean package -DskipTests
+                '''
             }
         }
 
