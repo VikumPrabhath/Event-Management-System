@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import EventsMegaMenu from '../../components/EventsMegaMenu/EventsMegaMenu';
 import './UserDashboard.css';
@@ -11,33 +11,110 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
   const [showMegaMenu, setShowMegaMenu] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  // Edit Profile Form state
-  const [name, setName] = useState(user?.name || 'Quick Take');
-  const [email, setEmail] = useState(user?.email || 'quicktake611@gmail.com');
-  const [phone, setPhone] = useState(user?.phone || '+1 234 567 890');
-  const [saveSuccess, setSaveSuccess] = useState(false);
-
   const currentUser = user || {
+    id: 'anonymous',
     name: 'Quick Take',
     email: 'quicktake611@gmail.com',
+    phone: '+1 234 567 890',
     authProvider: 'Google',
     joinedDate: 'Jun 2026',
     eventsAttended: 0
   };
 
-  const handleSaveProfile = (e) => {
-    e.preventDefault();
-    if (onUpdateUser) {
-      onUpdateUser({
-        ...currentUser,
-        name,
-        email,
-        phone
-      });
+  // Edit Profile Form state
+  const [name, setName] = useState(currentUser.name);
+  const [email, setEmail] = useState(currentUser.email);
+  const [phone, setPhone] = useState(currentUser.phone);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Bookings list state
+  const [bookings, setBookings] = useState([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+
+  useEffect(() => {
+    // Sync inputs if user changes
+    setName(currentUser.name);
+    setEmail(currentUser.email);
+    setPhone(currentUser.phone);
+  }, [user]);
+
+  useEffect(() => {
+    if (currentUser?.id && currentUser.id !== 'anonymous') {
+      setLoadingBookings(true);
+      fetch(`http://localhost:8081/api/bookings/history/${currentUser.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to load bookings');
+          return res.json();
+        })
+        .then(data => {
+          setBookings(data);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+        .finally(() => {
+          setLoadingBookings(false);
+        });
     }
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+  }, [currentUser?.id]);
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    if (currentUser.id === 'anonymous') {
+      alert('Cannot update guest profile.');
+      return;
+    }
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const payload = {
+      firstName,
+      lastName,
+      email,
+      mobileNo: phone
+    };
+
+    try {
+      const res = await fetch(`http://localhost:8081/api/users/profile/${currentUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || 'Failed to update profile');
+      }
+
+      const updatedData = await res.json();
+      if (onUpdateUser) {
+        onUpdateUser({
+          ...currentUser,
+          name: `${updatedData.firstName} ${updatedData.lastName}`.trim(),
+          email: updatedData.email,
+          phone: updatedData.mobileNo
+        });
+      }
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      alert(err.message || 'Error updating profile');
+    }
   };
+
+  const filteredBookings = bookings.filter(b => {
+    if (filterStatus !== 'All' && b.status !== filterStatus) {
+      return false;
+    }
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const matchesTitle = b.eventTitle?.toLowerCase().includes(term);
+      const matchesId = b.id?.toLowerCase().includes(term);
+      return matchesTitle || matchesId;
+    }
+    return true;
+  });
 
   return (
     <div className="dashboard-container">
@@ -107,8 +184,8 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
                 </svg>
               </div>
               <div className="stat-content">
-                <div className="stat-number">{currentUser.eventsAttended || 0}</div>
-                <div className="stat-label">Events Attended</div>
+                <div className="stat-number">{bookings.length}</div>
+                <div className="stat-label">Events Booked</div>
               </div>
             </div>
           </div>
@@ -164,38 +241,62 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
                 ))}
               </div>
 
-              {/* Upcoming Events Section */}
               <section className="tickets-section">
                 <div className="section-header">
-                  <h3>Upcoming Events Tickets</h3>
-                  <span className="ticket-count-tag">0 Tickets</span>
+                  <h3>My Tickets</h3>
+                  <span className="ticket-count-tag">{filteredBookings.length} {filteredBookings.length === 1 ? 'Ticket' : 'Tickets'}</span>
                 </div>
 
-                {/* Empty State Card matching screenshot */}
-                <div className="empty-state-card">
-                  <div className="empty-illustration">
-                    {/* SVG Illustration simulating box holder */}
-                    <svg width="100" height="100" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="40" fill="#f39c12" opacity="0.2" />
-                      <path d="M35 30 H65 V70 H35 Z" fill="#ff7979" rx="4" />
-                      <path d="M30 40 L50 25 L70 40 L50 55 Z" fill="#ffbe76" />
-                      <circle cx="50" cy="55" r="8" fill="#6c5ce7" />
-                    </svg>
+                {loadingBookings ? (
+                  <div style={{color: '#a0a5b5', padding: '20px 0'}}>Loading your bookings...</div>
+                ) : filteredBookings.length === 0 ? (
+                  /* Empty State Card matching screenshot */
+                  <div className="empty-state-card">
+                    <div className="empty-illustration">
+                      {/* SVG Illustration simulating box holder */}
+                      <svg width="100" height="100" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" fill="#f39c12" opacity="0.2" />
+                        <path d="M35 30 H65 V70 H35 Z" fill="#ff7979" rx="4" />
+                        <path d="M30 40 L50 25 L70 40 L50 55 Z" fill="#ffbe76" />
+                        <circle cx="50" cy="55" r="8" fill="#6c5ce7" />
+                      </svg>
+                    </div>
+                    <h4>No bookings found</h4>
+                    <p>No tickets found matching current filters. Browse events and book your next experience!</p>
+                    <button className="explore-btn" onClick={() => navigate('/')}>
+                      Explore Events
+                    </button>
                   </div>
-                  <h4>No upcoming events</h4>
-                  <p>You don't have any upcoming tickets. Browse events and book your next experience!</p>
-                  <button className="explore-btn" onClick={() => navigate('/')}>
-                    Explore Events
-                  </button>
-                </div>
-              </section>
-
-              {/* Past Events Section */}
-              <section className="tickets-section past-section">
-                <div className="section-header">
-                  <h3>Past Events Tickets</h3>
-                  <span className="ticket-count-tag">0 Tickets</span>
-                </div>
+                ) : (
+                  <div className="bookings-grid">
+                    {filteredBookings.map(b => (
+                      <div key={b.id || Math.random().toString()} className="booking-card">
+                        <div className="booking-card-header">
+                          <h4 className="booking-event-title-display">{b.eventTitle || 'Event Ticket'}</h4>
+                          <span className={`booking-status-badge ${b.status ? b.status.toLowerCase() : 'confirmed'}`}>
+                            {b.status || 'Confirmed'}
+                          </span>
+                        </div>
+                        <div className="booking-card-details">
+                          {b.goldCount > 0 && <div><span>Gold ticket(s):</span> <span>{b.goldCount}</span></div>}
+                          {b.platinumCount > 0 && <div><span>Platinum ticket(s):</span> <span>{b.platinumCount}</span></div>}
+                          {b.goldTableCount > 0 && <div><span>Gold Table(s):</span> <span>{b.goldTableCount}</span></div>}
+                          {b.platinumTableCount > 0 && <div><span>Platinum Table(s):</span> <span>{b.platinumTableCount}</span></div>}
+                          {b.paymentMethod && <div><span>Payment Method:</span> <span>{b.paymentMethod.toUpperCase()}</span></div>}
+                          {b.id && <div><span>Booking ID:</span> <span>#{b.id.substring(b.id.length - 8).toUpperCase()}</span></div>}
+                        </div>
+                        <div className="booking-card-footer">
+                          <span className="booking-date-display">
+                            {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString() : 'N/A'}
+                          </span>
+                          <span className="booking-amount-display">
+                            {b.totalAmount ? b.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'} LKR
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
           ) : (

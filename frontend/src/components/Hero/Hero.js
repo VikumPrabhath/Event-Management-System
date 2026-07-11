@@ -2,52 +2,53 @@ import React, { useState, useEffect } from 'react';
 import './Hero.css';
 
 function Hero({ onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
-  // Exact 3D Card Stack Dataset matching the reference image
-  const stackEvents = [
-    {
-      id: 'bogambara-prison',
-      title: 'Bogambara Prison Park Kandy',
-      date: 'FRI, JUL 24, 2026',
-      doors: 'Doors 7:00 PM',
-      price: 'LKR 2,000.00',
-      countdown: '26d : 07h : 17m',
-      bgGradient: 'linear-gradient(135deg, #1f1c2c, #4a4c84)',
-      icon: '🎸'
-    },
-    {
-      id: 'sihina-nagaraya',
-      title: 'Sihina Nagaraya Lotus Tower',
-      date: 'FRI, JUL 3, 2026',
-      doors: 'Doors 7:00 PM',
-      price: 'LKR 2,000.00',
-      countdown: '05d : 14h : 22m',
-      bgGradient: 'linear-gradient(135deg, #0f2027, #2c5364)',
-      icon: '🎤'
-    },
-    {
-      id: 'marians-edge',
-      title: 'Marians Live at the Edge',
-      date: 'SAT, MAY 17, 2026',
-      doors: 'Doors 7:30 PM',
-      price: 'LKR 4,000.00',
-      countdown: '12d : 09h : 05m',
-      bgGradient: 'linear-gradient(135deg, #8A2387, #E94057)',
-      icon: '🎷'
-    }
-  ];
+  const [dbEvents, setDbEvents] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8081/api/events')
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        if (data && data.length > 0) {
+          setDbEvents(data);
+        }
+      })
+      .catch(err => {
+        console.warn('Hero events load error');
+      });
+  }, []);
+
+  const stackEvents = dbEvents.map(e => ({
+    id: e.id,
+    title: e.title,
+    date: e.date ? new Date(e.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'UPCOMING',
+    doors: `Doors ${e.timeFrom || '7:00 PM'}`,
+    price: e.ticketTiers && e.ticketTiers.length > 0 ? `LKR ${e.ticketTiers[0].price.toLocaleString()}` : 'Free',
+    countdown: 'Upcoming',
+    bgGradient: 'linear-gradient(135deg, #1f1c2c, #4a4c84)',
+    icon: '🎤',
+    ticketTiers: e.ticketTiers,
+    earlyBirdDiscount: e.earlyBirdDiscount,
+    earlyBirdLimit: e.earlyBirdLimit,
+    ticketsSold: e.ticketsSold
+  }));
 
   const [activeIdx, setActiveIdx] = useState(0);
 
   // Auto-cycle animation timer (swapping cards every 3.5s)
   useEffect(() => {
+    if (stackEvents.length === 0) return;
     const timer = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % stackEvents.length);
     }, 3500);
     return () => clearInterval(timer);
   }, [stackEvents.length]);
 
-  const activeCard = stackEvents[activeIdx];
-  const nextCard = stackEvents[(activeIdx + 1) % stackEvents.length];
+  const hasEvents = stackEvents.length > 0;
+  const activeCard = hasEvents ? stackEvents[activeIdx] : null;
+  const nextCard = hasEvents ? stackEvents[(activeIdx + 1) % stackEvents.length] : null;
 
   return (
     <section className="hero-modern">
@@ -95,72 +96,77 @@ function Hero({ onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
 
         {/* Right Column: Animated 3D Card Stack Showcase (Matching exact image layout) */}
         <div className="hero-right">
-          
-          <div className="exact-3d-stack-wrapper">
-            {/* Realistic Explosive Sky Fireworks Background (Strictly UNDER the cards) */}
-            <div className="fireworks-container">
-              {[1, 2, 3].map((fw, fwIndex) => (
-                <div className={`realistic-firework fw-${fw}`} key={fwIndex}>
-                  {[...Array(24)].map((_, i) => (
-                    <div className="spark" key={i} style={{ transform: `rotate(${i * 15}deg)` }}></div>
-                  ))}
-                </div>
-              ))}
-            </div>
-            
-            {/* Dynamic Ambient Glowing Shape */}
-            <div className="ambient-glow-shape"></div>
-
-            {/* Background Card (Tilted behind) */}
-            <div className="stack-3d-bg-card">
-              <div className="bg-poster-area" style={{ background: nextCard.bgGradient }}>
-                <span className="bg-icon">{nextCard.icon}</span>
+          {hasEvents ? (
+            <div className="exact-3d-stack-wrapper">
+              {/* Realistic Explosive Sky Fireworks Background (Strictly UNDER the cards) */}
+              <div className="fireworks-container">
+                {[1, 2, 3].map((fw, fwIndex) => (
+                  <div className={`realistic-firework fw-${fw}`} key={fwIndex}>
+                    {[...Array(24)].map((_, i) => (
+                      <div className="spark" key={i} style={{ transform: `rotate(${i * 15}deg)` }}></div>
+                    ))}
+                  </div>
+                ))}
               </div>
-            </div>
+              
+              {/* Dynamic Ambient Glowing Shape */}
+              <div className="ambient-glow-shape"></div>
 
-            {/* Foreground Main Animated Card */}
-            <div 
-              className="stack-3d-fg-card card-swap-anim"
-              key={activeCard.id}
-              onClick={() => onSelectEvent && onSelectEvent(activeCard)}
-            >
-              {/* Poster Image Area */}
-              <div className="fg-poster-area" style={{ background: activeCard.bgGradient }}>
-                <span className="fg-icon">{activeCard.icon}</span>
+              {/* Background Card (Tilted behind) */}
+              <div className="stack-3d-bg-card">
+                <div className="bg-poster-area" style={{ background: nextCard.bgGradient }}>
+                  <span className="bg-icon">{nextCard.icon}</span>
+                </div>
+              </div>
 
-                {/* Pop-out Countdown Badge at bottom-left image border */}
-                <div className="exact-popout-countdown">
-                  <div className="orange-clock-circle">⏰</div>
-                  <div className="countdown-labels">
-                    <label>STARTS IN</label>
-                    <strong>{activeCard.countdown}</strong>
+              {/* Foreground Main Animated Card */}
+              <div 
+                className="stack-3d-fg-card card-swap-anim"
+                key={activeCard.id}
+                onClick={() => onSelectEvent && onSelectEvent(activeCard)}
+              >
+                {/* Poster Image Area */}
+                <div className="fg-poster-area" style={{ background: activeCard.bgGradient }}>
+                  <span className="fg-icon">{activeCard.icon}</span>
+
+                  {/* Pop-out Countdown Badge at bottom-left image border */}
+                  <div className="exact-popout-countdown">
+                    <div className="orange-clock-circle">⏰</div>
+                    <div className="countdown-labels">
+                      <label>STARTS IN</label>
+                      <strong>{activeCard.countdown}</strong>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Dashed Separator Line */}
-              <div className="card-dashed-divider"></div>
+                {/* Dashed Separator Line */}
+                <div className="card-dashed-divider"></div>
 
-              {/* Card Body */}
-              <div className="fg-card-body">
-                <div className="body-left-info">
-                  <span className="fg-date">{activeCard.date}</span>
-                  <h4 className="fg-title">{activeCard.title}</h4>
-                  <span className="fg-doors">{activeCard.doors}</span>
+                {/* Card Body */}
+                <div className="fg-card-body">
+                  <div className="body-left-info">
+                    <span className="fg-date">{activeCard.date}</span>
+                    <h4 className="fg-title">{activeCard.title}</h4>
+                    <span className="fg-doors">{activeCard.doors}</span>
+                  </div>
+                  <div className="body-right-price">
+                    <label>FROM</label>
+                    <strong className="fg-price-val">{activeCard.price}</strong>
+                  </div>
                 </div>
-                <div className="body-right-price">
-                  <label>FROM</label>
-                  <strong className="fg-price-val">{activeCard.price}</strong>
+
+                {/* Pop-out Corner Badge at bottom-right corner */}
+                <div className="exact-popout-trending-badge">
+                  ★ Now Trending 🔥
                 </div>
               </div>
 
-              {/* Pop-out Corner Badge at bottom-right corner */}
-              <div className="exact-popout-trending-badge">
-                ★ Now Trending 🔥
-              </div>
             </div>
-
-          </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8b90a0' }}>
+              <p>No featured events scheduled yet.</p>
+            </div>
+          )}
         </div>
 
       </div>

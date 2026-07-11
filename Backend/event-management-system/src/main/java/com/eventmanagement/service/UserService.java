@@ -63,4 +63,35 @@ public class UserService {
     public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
-}
+
+    public User updateUser(String id, User updatedUser) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        if (updatedUser.getEmail() != null && !updatedUser.getEmail().trim().isEmpty() && !updatedUser.getEmail().equals(existingUser.getEmail())) {
+            User userWithEmail = userRepository.findByEmail(updatedUser.getEmail());
+            if (userWithEmail != null && !userWithEmail.getId().equals(id)) {
+                throw new RuntimeException("Email is already registered by another account!");
+            }
+            existingUser.setEmail(updatedUser.getEmail());
+        }
+
+        if (updatedUser.getMobileNo() != null && !updatedUser.getMobileNo().trim().isEmpty() && !updatedUser.getMobileNo().equals(existingUser.getMobileNo())) {
+            User userWithMobile = userRepository.findByMobileNo(updatedUser.getMobileNo());
+            if (userWithMobile != null && !userWithMobile.getId().equals(id)) {
+                throw new RuntimeException("Mobile number is already registered by another account!");
+            }
+            existingUser.setMobileNo(updatedUser.getMobileNo());
+        }
+
+        if (updatedUser.getFirstName() != null && !updatedUser.getFirstName().trim().isEmpty()) {
+            existingUser.setFirstName(updatedUser.getFirstName());
+        }
+        if (updatedUser.getLastName() != null && !updatedUser.getLastName().trim().isEmpty()) {
+            existingUser.setLastName(updatedUser.getLastName());
+        }
+
+        existingUser.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(existingUser);
+    }
+}

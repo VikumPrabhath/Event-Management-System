@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminPortal/AdminDashboard';
 import AddEventPage from './pages/AddEventPage/AddEventPage';
 import AdminEventStatsPage from './pages/AdminEventStatsPage/AdminEventStatsPage';
 import UserDashboard from './pages/UserDashboard/UserDashboard';
+import OrganizerDashboard from './pages/OrganizerPortal/OrganizerDashboard';
 import AuthModal from './components/AuthModal/AuthModal';
 import OrganizerAuthModal from './components/OrganizerAuthModal/OrganizerAuthModal';
 import './App.css';
@@ -20,7 +21,14 @@ function AppContent() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showOrganizerAuthModal, setShowOrganizerAuthModal] = useState(false);
   const [theme, setTheme] = useState('dark');
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    return localStorage.getItem('admin_authenticated') === 'true';
+  });
+
+  const handleAdminLogin = (val) => {
+    setIsAdminAuthenticated(val);
+    localStorage.setItem('admin_authenticated', val ? 'true' : 'false');
+  };
 
   // User Auth State initialized from localStorage
   const [user, setUser] = useState(() => {
@@ -31,6 +39,9 @@ function AppContent() {
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem('user_session', JSON.stringify(userData));
+    if (userData.role === 'Organizer') {
+      navigate('/organizer/dashboard');
+    }
   };
 
   const handleLogout = () => {
@@ -52,13 +63,10 @@ function AppContent() {
   }, [theme]);
 
   useEffect(() => {
-    fetch('/api/users')
+    fetch('/api/auth/status')
       .then(response => {
-        if (response.ok) {
-          setConnectionStatus('connected');
-        } else {
-          setConnectionStatus('error');
-        }
+        // Any response (ok or unauthorized status) means the backend is up & running!
+        setConnectionStatus('connected');
       })
       .catch(() => {
         setConnectionStatus('disconnected');
@@ -124,7 +132,7 @@ function AppContent() {
             isAdminAuthenticated ? (
               <AdminDashboard theme={theme} toggleTheme={toggleTheme} />
             ) : (
-              <AdminLogin onLogin={setIsAdminAuthenticated} />
+              <AdminLogin onLogin={handleAdminLogin} />
             )
           } 
         />
@@ -132,8 +140,8 @@ function AppContent() {
         <Route 
           path="/admin/add-event" 
           element={
-            isAdminAuthenticated ? (
-              <AddEventPage theme={theme} toggleTheme={toggleTheme} />
+            isAdminAuthenticated || user?.role === 'Organizer' ? (
+              <AddEventPage theme={theme} toggleTheme={toggleTheme} user={user} />
             ) : (
               <Navigate to="/admin" replace />
             )
@@ -141,9 +149,25 @@ function AppContent() {
         />
 
         <Route 
+          path="/organizer/dashboard" 
+          element={
+            user?.role === 'Organizer' ? (
+              <OrganizerDashboard 
+                user={user} 
+                onLogout={handleLogout} 
+                theme={theme} 
+                toggleTheme={toggleTheme} 
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
+
+        <Route 
           path="/admin/event/:id/stats" 
           element={
-            isAdminAuthenticated ? (
+            isAdminAuthenticated || user?.role === 'Organizer' ? (
               <AdminEventStatsPage theme={theme} toggleTheme={toggleTheme} />
             ) : (
               <Navigate to="/admin" replace />
@@ -156,6 +180,7 @@ function AppContent() {
         <TicketBooking 
           event={selectedEvent} 
           onClose={() => setShowBookingModal(false)} 
+          user={user}
         />
       )}
 
