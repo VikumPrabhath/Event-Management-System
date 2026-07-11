@@ -109,20 +109,8 @@ function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         onClose();
       }
     } catch (err) {
-      console.warn('Backend connection error or fallback:', err);
-      // Fallback local session if backend server is not yet running/connected
-      const displayName = mode === 'register' ? `${firstName} ${lastName}`.trim() || 'User' : email.split('@')[0] || 'User';
-      const fallbackData = {
-        id: 'user_' + Date.now(),
-        name: displayName,
-        email: email,
-        phone: mobileNo,
-        authProvider: 'Email',
-        joinedDate: 'Jun 2026',
-        eventsAttended: 0
-      };
-      onLoginSuccess(fallbackData);
-      onClose();
+      console.warn('Backend connection error:', err);
+      setErrorMsg(err.message || 'Connection to authentication service failed.');
     } finally {
       setLoading(false);
     }

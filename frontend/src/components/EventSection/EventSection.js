@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EventCard from '../EventCard/EventCard';
 import SportsCard from '../SportsCard/SportsCard';
 import './EventSection.css';
 
 function EventSection({ onSelectEvent }) {
   const [activeTab, setActiveTab] = useState('Concerts');
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8081/api/events')
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        setEvents(data);
+      })
+      .catch(err => {
+        console.warn('Backend events connection error, using mock data.');
+      });
+  }, []);
 
   const tabs = ['Concerts', 'Sports & Adventure', 'Art & Drama', 'Family'];
 
@@ -94,6 +109,32 @@ function EventSection({ onSelectEvent }) {
     ]
   };
 
+  const getCategorizedEvents = (cat) => {
+    const mapping = {
+      'Concerts': 'music',
+      'Sports & Adventure': 'sports',
+      'Art & Drama': 'drama',
+      'Family': 'family'
+    };
+    
+    const dbCat = mapping[cat];
+    const dbEvents = events.filter(e => e.category === dbCat).map(e => ({
+      id: e.id,
+      date: e.date ? new Date(e.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : '',
+      time: e.timeFrom || '',
+      title: e.title,
+      category: e.category === 'music' ? 'Concert & Music' : e.category === 'sports' ? 'Sport & Adventure' : e.category === 'drama' ? 'Art & Drama' : 'Family & Others',
+      price: e.ticketTiers && e.ticketTiers.length > 0 ? `LKR ${e.ticketTiers[0].price.toLocaleString()}` : 'LKR 0.00',
+      countdown: 'Upcoming',
+      trendingTag: e.trendingTag || '★ Featured',
+      image: e.imageUrl
+    }));
+
+    return dbEvents;
+  };
+
+  const currentTabEvents = getCategorizedEvents(activeTab);
+
   return (
     <section id="events-grid-section" className="event-section">
       <div className="section-container">
@@ -114,15 +155,12 @@ function EventSection({ onSelectEvent }) {
         </div>
 
         <div className="events-grid">
-          {activeTab === 'Sports & Adventure' ? (
-            mockEvents['Sports & Adventure'].map((event, index) => (
-              <SportsCard key={index} event={event} onSelectEvent={onSelectEvent} />
-            ))
-          ) : (
-            mockEvents[activeTab]?.map((event, index) => (
-              <EventCard key={index} event={event} onSelectEvent={onSelectEvent} />
-            ))
-          )}
+          {currentTabEvents.map((event, index) => {
+            if (activeTab === 'Sports & Adventure' && event.teamA && event.teamB) {
+              return <SportsCard key={index} event={event} onSelectEvent={onSelectEvent} />;
+            }
+            return <EventCard key={index} event={event} onSelectEvent={onSelectEvent} />;
+          })}
         </div>
       </div>
     </section>

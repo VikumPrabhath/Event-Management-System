@@ -8,21 +8,62 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [orgName, setOrgName] = useState('');
   const [phone, setPhone] = useState('');
 
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const organizerData = {
-      id: 'org_' + Date.now(),
-      name: mode === 'register' ? orgName : (email.split('@')[0] || 'Organizer'),
-      email: email,
-      role: 'Organizer',
-      authProvider: 'Email',
-      joinedDate: 'Jun 2026',
-      eventsAttended: 0
-    };
-    onLoginSuccess(organizerData);
-    onClose();
+    setErrorMsg('');
+    setLoading(true);
+
+    try {
+      if (mode === 'register') {
+        const payload = { orgName, phone, email, password };
+        const res = await fetch('http://localhost:8081/api/organizers/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(errText || 'Registration failed.');
+        }
+
+        alert('Registration successful! Please wait for Admin approval before logging in.');
+        setMode('login');
+      } else {
+        const payload = { email, password };
+        const res = await fetch('http://localhost:8081/api/organizers/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(errText || 'Invalid credentials or pending approval.');
+        }
+
+        const data = await res.json();
+        // Map backend properties to session properties
+        const sessionData = {
+          id: data.id,
+          name: data.orgName,
+          email: data.email,
+          role: 'Organizer',
+          joinedDate: 'Jun 2026'
+        };
+        onLoginSuccess(sessionData);
+        onClose();
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Connection failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,6 +92,7 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
         </div>
 
         <form onSubmit={handleSubmit} className="org-form">
+          {errorMsg && <div className="org-error-banner" style={{color: '#ff7979', marginBottom: '14px', fontSize: '13px'}}>{errorMsg}</div>}
           {mode === 'register' && (
             <>
               <div className="form-group">

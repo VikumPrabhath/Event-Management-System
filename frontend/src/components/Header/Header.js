@@ -62,7 +62,7 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
             <a href="#concerts" className="nav-link">Concerts</a>
             <a href="#theater" className="nav-link">Theater</a>
             {user ? (
-              <Link to="/dashboard" className="nav-link user-dash-link">
+              <Link to={user.role === 'Organizer' ? "/organizer/dashboard" : "/dashboard"} className="nav-link user-dash-link">
                 My Dashboard
               </Link>
             ) : (
@@ -90,11 +90,20 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
       ) : (
         <>
           <div className="admin-header-title">Admin Dashboard</div>
-          <div className="admin-profile">
+          <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className="admin-avatar">👤</div>
             <span className="admin-welcome">Welcome Admin</span>
             <button className="theme-toggle-btn admin-theme-btn" onClick={toggleTheme}>
               {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+            <button 
+              onClick={() => {
+                localStorage.setItem('admin_authenticated', 'false');
+                window.location.href = '/admin';
+              }}
+              style={{ background: 'transparent', border: '1px solid #2a2d3d', color: '#8b90a0', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}
+            >
+              Logout
             </button>
           </div>
         </>

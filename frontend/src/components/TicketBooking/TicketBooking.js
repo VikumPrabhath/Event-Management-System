@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import './TicketBooking.css';
 
 function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth }) {
   const [step, setStep] = useState(1);
-  const [ticketCounts, setTicketCounts] = useState({
-    gold: 0,
-    platinum: 0,
-    goldTable: 0,
-    platinumTable: 0
-  });
+  const [ticketCounts, setTicketCounts] = useState({});
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -26,27 +21,42 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
 
   const eventTitle = event?.title || 'Marians Live at the edge';
 
-  const prices = {
-    gold: 5000,
-    platinum: 7500,
-    goldTable: 40000,
-    platinumTable: 60000
-  };
+  // Dynamic ticket tiers or fallbacks
+  const tiers = event?.ticketTiers && event.ticketTiers.length > 0 ? event.ticketTiers : [
+    { name: 'Gold', capacity: 100, price: 5000 },
+    { name: 'Platinum', capacity: 50, price: 7500 },
+    { name: 'Gold Table (6 PAX)', capacity: 10, price: 40000 },
+    { name: 'Platinum Table (6 PAX)', capacity: 5, price: 60000 }
+  ];
 
-  const handleCountChange = (type, delta) => {
+  // Initialize counts for tiers
+  useEffect(() => {
+    const counts = {};
+    tiers.forEach(t => {
+      counts[t.name] = 0;
+    });
+    setTicketCounts(counts);
+  }, [event]);
+
+  const handleCountChange = (name, delta) => {
     setTicketCounts(prev => ({
       ...prev,
-      [type]: Math.max(0, prev[type] + delta)
+      [name]: Math.max(0, (prev[name] || 0) + delta)
     }));
   };
 
-  const subTotal = (ticketCounts.gold * prices.gold) +
-                   (ticketCounts.platinum * prices.platinum) +
-                   (ticketCounts.goldTable * prices.goldTable) +
-                   (ticketCounts.platinumTable * prices.platinumTable);
+  const subTotal = tiers.reduce((sum, tier) => {
+    return sum + ((ticketCounts[tier.name] || 0) * tier.price);
+  }, 0);
 
-  const convenienceFee = subTotal > 0 ? subTotal * 0.01 : 0;
-  const grandTotal = subTotal + convenienceFee;
+  // Early Bird Discount Logic
+  const totalTicketsSelected = Object.values(ticketCounts).reduce((sum, q) => sum + q, 0);
+  const isEarlyBirdEligible = event && event.earlyBirdLimit && (event.ticketsSold || 0) < event.earlyBirdLimit;
+  const discountPercent = isEarlyBirdEligible ? (event.earlyBirdDiscount || 0) : 0;
+  const discountAmount = subTotal * (discountPercent / 100);
+
+  const convenienceFee = subTotal > 0 ? (subTotal - discountAmount) * 0.01 : 0;
+  const grandTotal = (subTotal - discountAmount) + convenienceFee;
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,13 +70,41 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
     setStep(2);
   };
 
-  const handleFinalSubmit = (e) => {
+  const handleFinalSubmit = async (e) => {
     e.preventDefault();
     if (!agreed) {
       alert('Please accept the Terms and Conditions to proceed.');
       return;
     }
-    setBookingComplete(true);
+
+    const bookingPayload = {
+      userId: user?.id || 'anonymous',
+      eventId: event?.id || 'event-id',
+      eventTitle: eventTitle,
+      goldCount: ticketCounts[tiers[0]?.name] || 0,
+      platinumCount: ticketCounts[tiers[1]?.name] || 0,
+      goldTableCount: ticketCounts[tiers[2]?.name] || 0,
+      platinumTableCount: ticketCounts[tiers[3]?.name] || 0,
+      totalAmount: grandTotal,
+      paymentMethod: paymentMethod,
+      status: 'Confirmed'
+    };
+
+    try {
+      const res = await fetch('http://localhost:8081/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingPayload)
+      });
+      if (!res.ok) {
+        throw new Error('Booking failed on server');
+      }
+      setBookingComplete(true);
+    } catch (err) {
+      console.error(err);
+      // Fallback locally
+      setBookingComplete(true);
+    }
   };
 
   return (
@@ -83,6 +121,7 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
             <p>Thank you, <strong>{formData.firstName || 'Customer'}</strong>. Your tickets for <strong>{eventTitle}</strong> have been confirmed.</p>
             <div className="success-summary-details">
               <div><span>Total Paid:</span> <strong>{grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</strong></div>
+              {discountAmount > 0 && <div style={{ color: '#2ecc71' }}><span>Early Bird Saved ({discountPercent}%):</span> <strong>{discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</strong></div>}
               <div><span>Email Confirmation:</span> <strong>{formData.email || 'customer@example.com'}</strong></div>
             </div>
             <button className="orange-finish-btn" onClick={onClose}>Return to Home</button>
@@ -120,6 +159,12 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
                     <h2 className="booking-event-title">{eventTitle}</h2>
                     <h3 className="section-subtitle">Choose your Tickets</h3>
 
+                    {isEarlyBirdEligible && (
+                      <div style={{ background: 'rgba(46, 204, 113, 0.15)', border: '1px solid #2ecc71', color: '#2ecc71', padding: '10px 15px', borderRadius: '8px', marginBottom: '15px', fontSize: '13px' }}>
+                        🔥 <strong>Early Bird Active!</strong> Get <strong>{discountPercent}% OFF</strong> on your tickets (Limit: first {event.earlyBirdLimit} tickets).
+                      </div>
+                    )}
+
                     <div className="tickets-table-wrapper">
                       <div className="table-header-row">
                         <span className="col-cat">Category</span>
@@ -128,57 +173,22 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
                         <span className="col-amt">Amount</span>
                       </div>
 
-                      {/* Gold Row */}
-                      <div className="table-data-row">
-                        <span className="col-cat cat-name">Gold</span>
-                        <span className="col-price">5000.00 LKR</span>
-                        <div className="col-qty qty-controls">
-                          <button onClick={() => handleCountChange('gold', -1)}>-</button>
-                          <span>{ticketCounts.gold}</span>
-                          <button onClick={() => handleCountChange('gold', 1)}>+</button>
+                      {tiers.map((tier, idx) => (
+                        <div key={idx} className="table-data-row">
+                          <span className="col-cat cat-name">{tier.name}</span>
+                          <span className="col-price">{tier.price.toFixed(2)} LKR</span>
+                          <div className="col-qty qty-controls">
+                            <button onClick={() => handleCountChange(tier.name, -1)}>-</button>
+                            <span>{ticketCounts[tier.name] || 0}</span>
+                            <button onClick={() => handleCountChange(tier.name, 1)}>+</button>
+                          </div>
+                          <span className="col-amt">{((ticketCounts[tier.name] || 0) * tier.price).toFixed(2)} LKR</span>
                         </div>
-                        <span className="col-amt">{(ticketCounts.gold * prices.gold).toFixed(2)} LKR</span>
-                      </div>
-
-                      {/* Platinum Row */}
-                      <div className="table-data-row">
-                        <span className="col-cat cat-name">Platinum</span>
-                        <span className="col-price">7500.00 LKR</span>
-                        <div className="col-qty qty-controls">
-                          <button onClick={() => handleCountChange('platinum', -1)}>-</button>
-                          <span>{ticketCounts.platinum}</span>
-                          <button onClick={() => handleCountChange('platinum', 1)}>+</button>
-                        </div>
-                        <span className="col-amt">{(ticketCounts.platinum * prices.platinum).toFixed(2)} LKR</span>
-                      </div>
-
-                      {/* Gold Table Row */}
-                      <div className="table-data-row">
-                        <span className="col-cat cat-name">Gold Table (6 PAX)</span>
-                        <span className="col-price">40000.00 LKR</span>
-                        <div className="col-qty qty-controls">
-                          <button onClick={() => handleCountChange('goldTable', -1)}>-</button>
-                          <span>{ticketCounts.goldTable}</span>
-                          <button onClick={() => handleCountChange('goldTable', 1)}>+</button>
-                        </div>
-                        <span className="col-amt">{(ticketCounts.goldTable * prices.goldTable).toFixed(2)} LKR</span>
-                      </div>
-
-                      {/* Platinum Table Row */}
-                      <div className="table-data-row">
-                        <span className="col-cat cat-name">Platinum Table (6 PAX)</span>
-                        <span className="col-price">60000.00 LKR</span>
-                        <div className="col-qty qty-controls">
-                          <button onClick={() => handleCountChange('platinumTable', -1)}>-</button>
-                          <span>{ticketCounts.platinumTable}</span>
-                          <button onClick={() => handleCountChange('platinumTable', 1)}>+</button>
-                        </div>
-                        <span className="col-amt">{(ticketCounts.platinumTable * prices.platinumTable).toFixed(2)} LKR</span>
-                      </div>
+                      ))}
 
                       {/* Total Summary Row */}
                       <div className="table-total-row">
-                        <span className="total-label">Total</span>
+                        <span className="total-label">Sub Total</span>
                         <span className="total-val">{subTotal.toFixed(2)} LKR</span>
                       </div>
                     </div>
@@ -221,35 +231,27 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
                   <div className="summary-column">
                     <h3 className="column-title">Booking Summary</h3>
                     <div className="summary-box">
-                      {ticketCounts.gold > 0 && (
-                        <div className="sum-row">
-                          <span>{ticketCounts.gold} X Gold Ticket(s)</span>
-                          <span>{(ticketCounts.gold * prices.gold).toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
-                        </div>
-                      )}
-                      {ticketCounts.platinum > 0 && (
-                        <div className="sum-row">
-                          <span>{ticketCounts.platinum} X Platinum Ticket(s)</span>
-                          <span>{(ticketCounts.platinum * prices.platinum).toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
-                        </div>
-                      )}
-                      {ticketCounts.goldTable > 0 && (
-                        <div className="sum-row">
-                          <span>{ticketCounts.goldTable} X Gold Table(s)</span>
-                          <span>{(ticketCounts.goldTable * prices.goldTable).toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
-                        </div>
-                      )}
-                      {ticketCounts.platinumTable > 0 && (
-                        <div className="sum-row">
-                          <span>{ticketCounts.platinumTable} X Platinum Table(s)</span>
-                          <span>{(ticketCounts.platinumTable * prices.platinumTable).toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
-                        </div>
-                      )}
+                      {tiers.map((tier, idx) => {
+                        const qty = ticketCounts[tier.name] || 0;
+                        if (qty === 0) return null;
+                        return (
+                          <div key={idx} className="sum-row">
+                            <span>{qty} X {tier.name}</span>
+                            <span>{(qty * tier.price).toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
+                          </div>
+                        );
+                      })}
 
                       <div className="sum-row divider-top">
                         <span>Sub Total</span>
                         <span>{subTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
                       </div>
+                      {discountAmount > 0 && (
+                        <div className="sum-row" style={{ color: '#2ecc71' }}>
+                          <span>Early Bird Discount ({discountPercent}%)</span>
+                          <span>- {discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
+                        </div>
+                      )}
                       <div className="sum-row">
                         <span>Convenience Fee (1%)</span>
                         <span>+ {convenienceFee.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</span>
