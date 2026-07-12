@@ -1,5 +1,5 @@
 # Use a lightweight Java runtime
-FROM openjdk:17-jdk-slim
+FROM amazoncorretto:17-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
