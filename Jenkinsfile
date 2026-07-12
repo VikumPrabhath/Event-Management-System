@@ -52,10 +52,12 @@ pipeline {
 
         stage('Push to Docker Hub (Optional)') {
             steps {
-                // Login to Docker Hub (requires credentials in Jenkins)
-                // docker login -u your-username -p your-password
-                sh 'docker push ${DOCKER_IMAGE_BACKEND}'
-                sh 'docker push ${DOCKER_IMAGE_FRONTEND}'
+                script {
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                    sh 'docker push vikumprabhath40/event-backend:latest'
+                    sh 'docker push vikumprabhath40/event-frontend:latest'
+                    }
+                }
             }
         }
 
