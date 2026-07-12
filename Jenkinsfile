@@ -63,14 +63,18 @@ pipeline {
 
         stage('Deploy to App Server') {
             steps {
-                // **FOR NOW**: Just print a message and run locally.
-                // When your App-Server VM is ready, we will replace this with an SSH command.
-                echo 'Deployment successful! (Running container locally for testing)'
-                sh 'docker run -d -p 8081:8081 --name backend-container ${DOCKER_IMAGE_BACKEND}'
-                sh 'docker run -d -p 80:80 --name frontend-container ${DOCKER_IMAGE_FRONTEND}'
+                sh '''
+                    ssh app-server@192.168.45.139 '
+                        docker pull vikumprabhath40/event-backend:latest
+                        docker pull vikumprabhath40/event-frontend:latest
+                        docker stop backend-container frontend-container || true
+                        docker rm backend-container frontend-container || true
+                        docker run -d -p 8081:8081 --name backend-container vikumprabhath40/event-backend:latest
+                        docker run -d -p 80:80 --name frontend-container vikumprabhath40/event-frontend:latest
+                    '
+                '''
             }
         }
-    }
 
     post {
         // Clean up old containers/images after build (to save space)
