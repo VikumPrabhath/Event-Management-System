@@ -63,7 +63,7 @@ function AppContent() {
   }, [theme]);
 
   useEffect(() => {
-    fetch('/api/auth/status')
+    fetch('http://localhost:8081/api/auth/status')
       .then(response => {
         // Any response (ok or unauthorized status) means the backend is up & running!
         setConnectionStatus('connected');

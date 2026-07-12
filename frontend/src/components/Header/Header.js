@@ -27,12 +27,14 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
               <span className="logo-out">out</span>
             </div>
           ) : (
-            <img 
-              src="/assets/sellout.png" 
-              alt="sellout logo" 
-              className="logo-img" 
-              onError={handleLogoError}
-            />
+            <div className="logo-wrapper">
+              <img 
+                src="/assets/sellout.png" 
+                alt="sellout logo" 
+                className="logo-img" 
+                onError={handleLogoError}
+              />
+            </div>
           )}
         </Link>
       </div>

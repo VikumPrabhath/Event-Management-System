@@ -8,25 +8,25 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
   const [ticketCounts, setTicketCounts] = useState({});
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.mobileNo || '',
     nic: ''
   });
 
   const [paymentMethod, setPaymentMethod] = useState('visa');
   const [agreed, setAgreed] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [bookingError, setBookingError] = useState('');
 
   const eventTitle = event?.title || 'Marians Live at the edge';
 
   // Dynamic ticket tiers or fallbacks
   const tiers = event?.ticketTiers && event.ticketTiers.length > 0 ? event.ticketTiers : [
-    { name: 'Gold', capacity: 100, price: 5000 },
-    { name: 'Platinum', capacity: 50, price: 7500 },
-    { name: 'Gold Table (6 PAX)', capacity: 10, price: 40000 },
-    { name: 'Platinum Table (6 PAX)', capacity: 5, price: 60000 }
+    { name: 'Gold', capacity: 100, price: 5000, sold: 0 },
+    { name: 'Platinum', capacity: 50, price: 7500, sold: 0 }
   ];
 
   // Initialize counts for tiers
@@ -38,11 +38,19 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
     setTicketCounts(counts);
   }, [event]);
 
-  const handleCountChange = (name, delta) => {
-    setTicketCounts(prev => ({
-      ...prev,
-      [name]: Math.max(0, (prev[name] || 0) + delta)
-    }));
+  const handleCountChange = (name, delta, tierCapacity, tierSold) => {
+    setTicketCounts(prev => {
+      const current = prev[name] || 0;
+      const next = current + delta;
+      const available = tierCapacity - (tierSold || 0);
+      
+      if (next < 0) return prev;
+      if (next > available) {
+        alert(`Cannot select more than available tickets. Only ${available} remaining.`);
+        return prev;
+      }
+      return { ...prev, [name]: next };
+    });
   };
 
   const subTotal = tiers.reduce((sum, tier) => {
@@ -77,14 +85,24 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
       return;
     }
 
+    setIsProcessing(true);
+
+    // MOCK PAYMENT GATEWAY
+    // Simulate network delay and gateway processing (e.g., 2 seconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    // As per user request: "even gateway failed we trigeer payment as ssuceess and book the tiket"
+    // So we ignore potential simulated failures and proceed to create the booking.
+
     const bookingPayload = {
       userId: user?.id || 'anonymous',
       eventId: event?.id || 'event-id',
       eventTitle: eventTitle,
-      goldCount: ticketCounts[tiers[0]?.name] || 0,
-      platinumCount: ticketCounts[tiers[1]?.name] || 0,
-      goldTableCount: ticketCounts[tiers[2]?.name] || 0,
-      platinumTableCount: ticketCounts[tiers[3]?.name] || 0,
+      selectedTiers: ticketCounts,
+      customerFirstName: formData.firstName,
+      customerLastName: formData.lastName,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      customerNic: formData.nic,
       totalAmount: grandTotal,
       paymentMethod: paymentMethod,
       status: 'Confirmed'
@@ -97,13 +115,15 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
         body: JSON.stringify(bookingPayload)
       });
       if (!res.ok) {
-        throw new Error('Booking failed on server');
+        const errText = await res.text();
+        throw new Error(errText || 'Booking failed on server');
       }
       setBookingComplete(true);
     } catch (err) {
       console.error(err);
-      // Fallback locally
-      setBookingComplete(true);
+      setBookingError(err.message || 'Payment or Booking failed. Tickets may be sold out.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -129,6 +149,11 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
         ) : (
           <>
             {/* Top Wizard Stepper */}
+            {bookingError && (
+              <div style={{ padding: '15px', background: '#ffcccc', color: '#ff0000', borderRadius: '8px', marginBottom: '15px', textAlign: 'center', fontWeight: 'bold' }}>
+                {bookingError}
+              </div>
+            )}
             <div className="wizard-stepper-row">
               <div className={`stepper-item ${step === 1 ? 'active' : 'completed'}`}>
                 <div className="step-circle">1</div>
@@ -175,12 +200,12 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
 
                       {tiers.map((tier, idx) => (
                         <div key={idx} className="table-data-row">
-                          <span className="col-cat cat-name">{tier.name}</span>
+                          <span className="col-cat cat-name">{tier.name} <br/><span style={{fontSize: '11px', color: '#8b90a0'}}>(Remaining: {tier.capacity - (tier.sold || 0)})</span></span>
                           <span className="col-price">{tier.price.toFixed(2)} LKR</span>
                           <div className="col-qty qty-controls">
-                            <button onClick={() => handleCountChange(tier.name, -1)}>-</button>
+                            <button onClick={() => handleCountChange(tier.name, -1, tier.capacity, tier.sold)}>-</button>
                             <span>{ticketCounts[tier.name] || 0}</span>
-                            <button onClick={() => handleCountChange(tier.name, 1)}>+</button>
+                            <button onClick={() => handleCountChange(tier.name, 1, tier.capacity, tier.sold)}>+</button>
                           </div>
                           <span className="col-amt">{((ticketCounts[tier.name] || 0) * tier.price).toFixed(2)} LKR</span>
                         </div>
@@ -276,6 +301,18 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
                         </div>
                       </label>
 
+                      {/* Mock VISA Card UI */}
+                      {paymentMethod === 'visa' && (
+                        <div className="mock-card-details" style={{ margin: '0 0 15px 0', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                          <input type="text" placeholder="Card Number (0000 0000 0000 0000)" required style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                            <input type="text" placeholder="MM/YY" required style={{ width: '50%', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                            <input type="text" placeholder="CVV" required style={{ width: '50%', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                          </div>
+                          <input type="text" placeholder="Cardholder Name" required style={{ width: '100%', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                        </div>
+                      )}
+
                       <label className={`pay-option-row ${paymentMethod === 'koko' ? 'selected' : ''}`}>
                         <input type="radio" name="payment" value="koko" checked={paymentMethod === 'koko'} onChange={() => setPaymentMethod('koko')} />
                         <div className="pay-label-content">
@@ -299,11 +336,11 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
                     </div>
 
                     <div className="step-two-buttons">
-                      <button type="button" className="gray-back-btn" onClick={() => setStep(1)}>
+                      <button type="button" className="gray-back-btn" onClick={() => setStep(1)} disabled={isProcessing}>
                         &lt; Back
                       </button>
-                      <button type="submit" className="orange-pay-btn">
-                        Proceed to pay &gt;
+                      <button type="submit" className="orange-pay-btn" disabled={isProcessing} style={{ opacity: isProcessing ? 0.7 : 1 }}>
+                        {isProcessing ? 'Processing Payment...' : 'Proceed to pay >'}
                       </button>
                     </div>
                   </div>

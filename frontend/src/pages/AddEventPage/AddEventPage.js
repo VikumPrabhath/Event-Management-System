@@ -3,6 +3,43 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import './AddEventPage.css';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix leaflet default icon issue
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+function LocationSelector({ setVenue, setMapCenter }) {
+  useMapEvents({
+    async click(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      setMapCenter([lat, lng]);
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await res.json();
+        if (data && data.display_name) {
+          // Keep it short
+          const parts = data.display_name.split(',');
+          setVenue(parts.slice(0, 3).join(', '));
+        } else {
+          setVenue(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        }
+      } catch (err) {
+        setVenue(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+      }
+    }
+  });
+  return null;
+}
 
 function AddEventPage({ theme, toggleTheme, user }) {
   const navigate = useNavigate();
@@ -13,6 +50,7 @@ function AddEventPage({ theme, toggleTheme, user }) {
   const [category, setCategory] = useState('music');
   const [description, setDescription] = useState('');
   const [venue, setVenue] = useState('');
+  const [mapCenter, setMapCenter] = useState([6.9271, 79.8612]); // Default Colombo
   const [eventDate, setEventDate] = useState('');
   const [timeFrom, setTimeFrom] = useState('18:00');
   const [timeTo, setTimeTo] = useState('22:00');
@@ -161,6 +199,8 @@ function AddEventPage({ theme, toggleTheme, user }) {
                     <option value="drama">Art & Drama</option>
                     <option value="sports">Sport & Adventure</option>
                     <option value="family">Family & Others</option>
+                    <option value="tech-meetup">Tech Meetup</option>
+                    <option value="dev-meetup">Developer Meetup</option>
                   </select>
                 </div>
                 <div className="form-row">
@@ -175,12 +215,19 @@ function AddEventPage({ theme, toggleTheme, user }) {
                 </div>
                 <div className="form-row">
                   <label>Status / Trending Badge</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. ★ Now Trending 🔥" 
+                  <select 
                     value={trendingTag}
                     onChange={(e) => setTrendingTag(e.target.value)}
-                  />
+                  >
+                    <option value="">-- No Tag --</option>
+                    <option value="★ Now Trending 🔥">★ Now Trending 🔥</option>
+                    <option value="⚡ Selling Fast">⚡ Selling Fast</option>
+                    <option value="🎟️ Instant Booking">🎟️ Instant Booking</option>
+                    <option value="🎭 Popular Play">🎭 Popular Play</option>
+                    <option value="🎡 Kids Special">🎡 Kids Special</option>
+                    <option value="💻 Tech Hub">💻 Tech Hub</option>
+                    <option value="🚀 Developer Choice">🚀 Developer Choice</option>
+                  </select>
                 </div>
               </div>
 
@@ -188,27 +235,25 @@ function AddEventPage({ theme, toggleTheme, user }) {
               <div className="form-section">
                 <h3 className="section-title">Time And Place</h3>
                 <div className="form-row">
-                  <label>Venue Name / Location</label>
+                  <label>Click on Map to set Location</label>
+                  <div style={{ height: '250px', width: '100%', marginBottom: '10px', borderRadius: '8px', overflow: 'hidden' }}>
+                    <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; OpenStreetMap contributors'
+                      />
+                      <Marker position={mapCenter} />
+                      <LocationSelector setVenue={setVenue} setMapCenter={setMapCenter} />
+                    </MapContainer>
+                  </div>
                   <input 
                     type="text" 
-                    placeholder="e.g. Lotus Tower, Colombo" 
+                    placeholder="Venue Name / Location" 
                     value={venue}
                     onChange={(e) => setVenue(e.target.value)}
                     required
                   />
                 </div>
-                {venue && (
-                  <div className="form-row" style={{ marginTop: '10px' }}>
-                    <iframe
-                      title="Location Map Preview"
-                      width="100%"
-                      height="200"
-                      style={{ border: 0, borderRadius: '8px' }}
-                      loading="lazy"
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(venue)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                    ></iframe>
-                  </div>
-                )}
                 <div className="form-row multi-col">
                   <label>Date & Time</label>
                   <div className="date-time-inputs">

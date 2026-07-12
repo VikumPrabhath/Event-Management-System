@@ -1,6 +1,7 @@
 package com.eventmanagement.controller;
 
 import com.eventmanagement.entity.Event;
+import com.eventmanagement.dto.EventSummaryDTO;
 import com.eventmanagement.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/events")
@@ -16,6 +18,29 @@ import java.util.List;
 public class EventController {
 
     private final EventRepository eventRepository;
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<EventSummaryDTO>> getEventSummaries() {
+        List<EventSummaryDTO> summaries = eventRepository.findAll().stream().map(e -> {
+            EventSummaryDTO dto = new EventSummaryDTO();
+            dto.setId(e.getId());
+            dto.setTitle(e.getTitle());
+            dto.setCategory(e.getCategory());
+            dto.setDate(e.getDate());
+            dto.setTimeFrom(e.getTimeFrom());
+            dto.setVenue(e.getVenue());
+            dto.setImageUrl(e.getImageUrl());
+            dto.setTrendingTag(e.getTrendingTag());
+            dto.setMinPrice(e.getTicketTiers() == null || e.getTicketTiers().isEmpty() ? 0 : e.getTicketTiers().get(0).getPrice());
+            dto.setEarlyBirdDiscount(e.getEarlyBirdDiscount());
+            dto.setEarlyBirdLimit(e.getEarlyBirdLimit());
+            dto.setTicketsSold(e.getTicketsSold());
+            int totalCap = e.getTicketTiers() == null ? 0 : e.getTicketTiers().stream().mapToInt(com.eventmanagement.entity.TicketTier::getCapacity).sum();
+            dto.setTotalCapacity(totalCap);
+            return dto;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(summaries);
+    }
 
     @GetMapping
     public ResponseEntity<List<Event>> getAllEvents() {

@@ -1,25 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './PromoBanners.css';
 
-function PromoBanners({ onSelectEvent }) {
-  const [dbEvents, setDbEvents] = useState([]);
+function PromoBanners({ events = [], onSelectEvent }) {
+  if (events.length === 0) return null;
 
-  useEffect(() => {
-    fetch('http://localhost:8081/api/events')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.length > 0) {
-          setDbEvents(data);
-        }
-      })
-      .catch(err => console.error(err));
-  }, []);
-
-  if (dbEvents.length === 0) return null;
-
-  const mainEvent = dbEvents[0];
-  const secondEvent = dbEvents.length > 1 ? dbEvents[1] : null;
-  const thirdEvent = dbEvents.length > 2 ? dbEvents[2] : null;
+  const mainEvent = events[0];
+  const secondEvent = events.length > 1 ? events[1] : null;
+  const thirdEvent = events.length > 2 ? events[2] : null;
 
   return (
     <section className="promo-banners-section">

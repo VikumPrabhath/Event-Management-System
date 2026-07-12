@@ -1,45 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './EventsMegaMenu.css';
 
 function EventsMegaMenu({ isOpen, onClose }) {
-  const [activeCategory, setActiveCategory] = useState('Outdoor Musical Concert');
+  const [activeCategory, setActiveCategory] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [categoryEvents, setCategoryEvents] = useState({});
+
+  useEffect(() => {
+    if (isOpen) {
+      fetch('http://localhost:8081/api/events/summary')
+        .then(res => res.json())
+        .then(data => {
+          if (!Array.isArray(data)) return;
+          
+          const grouped = {};
+          data.forEach(ev => {
+            const cat = ev.category || 'Other';
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push({
+              id: ev.id,
+              title: ev.title,
+              date: ev.date || 'TBA',
+              price: ev.minPrice ? `${ev.minPrice} LKR` : 'Free',
+              bg: ev.imageUrl ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url(${ev.imageUrl})` : 'linear-gradient(135deg, #0f2027, #2c5364)'
+            });
+          });
+
+          // Add a "Top events" category
+          grouped['Top events'] = data.filter(ev => ev.trendingTag).map(ev => ({
+             id: ev.id,
+             title: ev.title,
+             date: ev.date || 'TBA',
+             price: ev.minPrice ? `${ev.minPrice} LKR` : 'Free',
+             bg: ev.imageUrl ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url(${ev.imageUrl})` : 'linear-gradient(135deg, #0f2027, #2c5364)'
+          }));
+          
+          if (grouped['Top events'].length === 0 && data.length > 0) {
+              grouped['Top events'] = grouped[Object.keys(grouped)[0]] || [];
+          }
+
+          const cats = ['Top events', ...Object.keys(grouped).filter(c => c !== 'Top events')];
+          setCategoryEvents(grouped);
+          setCategories(cats);
+          setActiveCategory('Top events');
+        })
+        .catch(err => console.error("Failed to load mega menu events"));
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const categories = [
-    'Top events',
-    'Today',
-    'This Weekend',
-    'This Month',
-    'Indoor Musical Concert',
-    'EDM',
-    'Outdoor Musical Concert',
-    'Running Event',
-    'Theatre',
-    'Dinner Dance',
-    'Workshop',
-    'Comedy Show',
-    'Boat Party',
-    'All events'
-  ];
-
-  const categoryEvents = {
-    'Outdoor Musical Concert': [
-      { id: '1', title: 'SIHINA NAGARAYA', date: 'Fri 3 Jul', price: '2000 LKR', bg: 'linear-gradient(135deg, #0f2027, #2c5364)' },
-      { id: '2', title: 'MARIANS LIVE AT THE...', date: 'Fri 17 Jul', price: '5000 LKR', bg: 'linear-gradient(135deg, #11998e, #38ef7d)' },
-      { id: '3', title: 'PUB LONDON PRISION...', date: 'Fri 24 Jul', price: '2000 LKR', bg: 'linear-gradient(135deg, #ff9966, #ff5e62)' },
-      { id: '4', title: 'DHARA 2026', date: 'Sat 4 Jul', price: '1000 LKR', bg: 'linear-gradient(135deg, #8E2DE2, #4A00E0)' },
-      { id: '5', title: 'MIHIRAVIYE LANTERN...', date: 'Fri 10 Jul', price: '1500 LKR', bg: 'linear-gradient(135deg, #f80759, #bc4e9c)' },
-      { id: '6', title: 'PUB LONDON PRISION...', date: 'Sat 25 Jul', price: '2000 LKR', bg: 'linear-gradient(135deg, #ff416c, #ff4b2b)' },
-      { id: '7', title: 'YAATHRA', date: 'Fri 14 Aug', price: '5000 LKR', bg: 'linear-gradient(135deg, #f7971e, #ffd200)' }
-    ],
-    'Top events': [
-      { id: '101', title: 'COLOMBO MUSIC FEST', date: 'Sat 15 Aug', price: '4500 LKR', bg: 'linear-gradient(135deg, #654ea3, #eaafc8)' },
-      { id: '102', title: 'KANDY NIGHT LIVE', date: 'Fri 22 Aug', price: '3000 LKR', bg: 'linear-gradient(135deg, #2C3E50, #FD746C)' }
-    ]
-  };
-
-  const currentEvents = categoryEvents[activeCategory] || categoryEvents['Outdoor Musical Concert'];
+  const currentEvents = categoryEvents[activeCategory] || [];
 
   return (
     <div className="mega-menu-overlay" onClick={onClose}>
@@ -62,13 +74,15 @@ function EventsMegaMenu({ isOpen, onClose }) {
           <h2 className="mega-content-title">{activeCategory} Events</h2>
           <div className="events-mini-grid">
             {currentEvents.map((ev) => (
-              <div key={ev.id} className="mini-event-card">
-                <div className="mini-thumb" style={{ background: ev.bg }}></div>
-                <div className="mini-details">
-                  <h4 className="mini-title">{ev.title}</h4>
-                  <p className="mini-meta">{ev.date} - {ev.price}</p>
+              <Link to={`/event/${ev.id}`} key={ev.id} style={{ textDecoration: 'none' }}>
+                <div className="mini-event-card" onClick={onClose}>
+                  <div className="mini-thumb" style={{ background: ev.bg }}></div>
+                  <div className="mini-details">
+                    <h4 className="mini-title">{ev.title}</h4>
+                    <p className="mini-meta">{ev.date} - {ev.price}</p>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -1,41 +1,81 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import MapWidget from '../../components/MapWidget/MapWidget';
 import './EventDetails.css';
 
-function EventDetails({ event, onBack, onOpenBooking, theme, toggleTheme, user, onOpenAuth }) {
-  const defaultDetails = {
-    title: 'ANAGATHAYE BY WAYOO',
-    type: 'Indoor live in concert',
-    artistLineup: 'Athma Liyanage | Amal Perera | Namal Udugama | BNS',
-    musicBy: 'WAYO',
-    date: '2026-07-17 19:00:00',
-    venue: 'Musaeus College Auditorium',
-    organizer: 'Asipiya Entertainment'
-  };
-
-  const currentEvent = event || defaultDetails;
-
-  const [timeLeft, setTimeLeft] = useState({ days: 25, hours: 12, minutes: 54, seconds: 15 });
+function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenAuth }) {
+  const { id } = useParams();
+  const [currentEvent, setCurrentEvent] = useState(null);
+  const [organizer, setOrganizer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        return { ...prev, seconds: 59, minutes: prev.minutes > 0 ? prev.minutes - 1 : 59 };
+    fetch(`http://localhost:8081/api/events/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        setCurrentEvent(data);
+        setLoading(false);
+        if (data.organizerId) {
+          fetch(`http://localhost:8081/api/users/${data.organizerId}`)
+            .then(r => r.json())
+            .then(orgData => setOrganizer(orgData))
+            .catch(e => console.log('Failed to fetch organizer'));
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load event details", err);
+        setLoading(false);
       });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  }, [id]);
 
-  const ticketTiers = [
-    { name: 'Balcony', price: '4000.00 LKR' },
-    { name: 'Silver', price: '6000.00 LKR' },
-    { name: 'Gold', price: '7500.00 LKR' },
-    { name: 'Platinum', price: '10000.00 LKR' },
-    { name: 'VIP', price: '15000.00 LKR' }
-  ];
+  // Calculate Remaining Capacity
+  let remainingTickets = null;
+  if (currentEvent && currentEvent.ticketTiers) {
+    const totalCap = currentEvent.ticketTiers.reduce((sum, tier) => sum + tier.capacity, 0);
+    remainingTickets = totalCap - (currentEvent.ticketsSold || 0);
+    if (remainingTickets < 0) remainingTickets = 0;
+  }
+
+  useEffect(() => {
+    if (!currentEvent || !currentEvent.date) return;
+    const eventTime = new Date(currentEvent.date).getTime();
+    if (isNaN(eventTime)) return;
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const distance = eventTime - now;
+
+      if (distance < 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      });
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
+    return () => clearInterval(timer);
+  }, [currentEvent]);
+
+  if (loading) {
+    return <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`} style={{display:'flex', justifyContent:'center', alignItems:'center', minHeight:'100vh', color: theme === 'dark' ? '#fff' : '#000'}}><h2>Loading Event Details...</h2></div>;
+  }
+
+  if (!currentEvent) {
+    return <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`} style={{display:'flex', justifyContent:'center', alignItems:'center', minHeight:'100vh', color: theme === 'dark' ? '#fff' : '#000'}}><h2>Event Not Found</h2></div>;
+  }
 
   return (
     <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`}>
@@ -90,31 +130,43 @@ function EventDetails({ event, onBack, onOpenBooking, theme, toggleTheme, user, 
           {/* Left Column Info */}
           <div className="main-info-column">
             <h1 className="event-main-title">{currentEvent.title}</h1>
-            <p className="event-subtitle">{currentEvent.type || defaultDetails.type}</p>
+            <p className="event-subtitle">{currentEvent.type || currentEvent.category}</p>
 
             <div className="lineup-box">
-              <strong>Artist line up</strong>
-              <p>{currentEvent.artistLineup || defaultDetails.artistLineup}</p>
-              <p className="music-by">Music by {currentEvent.musicBy || defaultDetails.musicBy}</p>
+              <strong>About Event</strong>
+              <p>{currentEvent.description || 'Join us for an amazing experience!'}</p>
             </div>
 
             <div className="event-meta-list">
               <div className="meta-row">
                 <span className="meta-bullet">📅</span>
-                <span>{currentEvent.date}</span>
+                <span>{currentEvent.date} {currentEvent.timeFrom}</span>
               </div>
               <div className="meta-row">
                 <span className="meta-bullet">📍</span>
-                <span>{currentEvent.venue || defaultDetails.venue}</span>
+                <span>{currentEvent.venue || 'TBA'}</span>
               </div>
               <div className="meta-row">
                 <span className="meta-bullet">Organized by</span>
-                <span>{currentEvent.organizer || defaultDetails.organizer}</span>
+                <span>{organizer ? (organizer.companyName || organizer.name) : (currentEvent.organizerId || 'Event Organizer')}</span>
               </div>
             </div>
 
+            {remainingTickets !== null && (
+              <div style={{ marginTop: '15px', padding: '15px', background: 'rgba(255, 106, 19, 0.1)', border: '1px solid #ff6a13', borderRadius: '8px' }}>
+                <strong style={{ color: '#ff6a13', fontSize: '18px' }}>🎟️ Remaining Tickets: {remainingTickets}</strong>
+                {remainingTickets === 0 && <span style={{ marginLeft: '10px', color: 'red', fontWeight: 'bold' }}>SOLD OUT</span>}
+              </div>
+            )}
+            
+            {currentEvent.earlyBirdDiscount > 0 && (
+              <div style={{ marginTop: '10px', color: '#00ff80', fontWeight: 'bold' }}>
+                🌟 Early Bird Discount: {currentEvent.earlyBirdDiscount}% OFF!
+              </div>
+            )}
+
             {/* Map Widget embedded cleanly */}
-            <MapWidget venue={currentEvent.venue || defaultDetails.venue} />
+            <MapWidget venue={currentEvent.venue || 'TBA'} />
           </div>
 
           {/* Right Column Ticket Prices */}
@@ -122,12 +174,17 @@ function EventDetails({ event, onBack, onOpenBooking, theme, toggleTheme, user, 
             <div className="ticket-prices-card">
               <h2 className="prices-card-title">Ticket <span className="light-sub">Prices</span></h2>
               <div className="tiers-table">
-                {ticketTiers.map((tier, idx) => (
+                {currentEvent.ticketTiers && currentEvent.ticketTiers.length > 0 ? currentEvent.ticketTiers.map((tier, idx) => (
                   <div key={idx} className="tier-item-row">
                     <span className="tier-name-label">{tier.name}</span>
-                    <span className="tier-price-value">{tier.price}</span>
+                    <span className="tier-price-value">{tier.price} LKR</span>
                   </div>
-                ))}
+                )) : (
+                  <div className="tier-item-row">
+                    <span className="tier-name-label">General Admission</span>
+                    <span className="tier-price-value">Free / TBA</span>
+                  </div>
+                )}
               </div>
               <button className="buy-tickets-orange-btn" onClick={() => onOpenBooking(currentEvent)}>
                 Buy Tickets &gt;&gt;

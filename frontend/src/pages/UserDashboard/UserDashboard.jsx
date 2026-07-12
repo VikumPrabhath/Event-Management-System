@@ -278,10 +278,12 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
                           </span>
                         </div>
                         <div className="booking-card-details">
-                          {b.goldCount > 0 && <div><span>Gold ticket(s):</span> <span>{b.goldCount}</span></div>}
-                          {b.platinumCount > 0 && <div><span>Platinum ticket(s):</span> <span>{b.platinumCount}</span></div>}
-                          {b.goldTableCount > 0 && <div><span>Gold Table(s):</span> <span>{b.goldTableCount}</span></div>}
-                          {b.platinumTableCount > 0 && <div><span>Platinum Table(s):</span> <span>{b.platinumTableCount}</span></div>}
+                          {b.selectedTiers && Object.entries(b.selectedTiers).map(([tierName, qty]) => {
+                            if (qty > 0) {
+                              return <div key={tierName}><span>{tierName}:</span> <span>{qty}</span></div>;
+                            }
+                            return null;
+                          })}
                           {b.paymentMethod && <div><span>Payment Method:</span> <span>{b.paymentMethod.toUpperCase()}</span></div>}
                           {b.id && <div><span>Booking ID:</span> <span>#{b.id.substring(b.id.length - 8).toUpperCase()}</span></div>}
                         </div>

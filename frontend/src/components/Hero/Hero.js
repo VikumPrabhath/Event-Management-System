@@ -1,34 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import './Hero.css';
 
-function Hero({ onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
-  const [dbEvents, setDbEvents] = useState([]);
+function Hero({ events = [], onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
+  const getCountdown = (dateString) => {
+    if (!dateString) return 'Upcoming';
+    const eventTime = new Date(dateString).getTime();
+    if (isNaN(eventTime)) return 'Upcoming';
+    const now = new Date().getTime();
+    const distance = eventTime - now;
+    if (distance < 0) return 'Started / Ended';
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    return `${days}d : ${hours}h : ${minutes}m`;
+  };
 
-  useEffect(() => {
-    fetch('http://localhost:8081/api/events')
-      .then(res => {
-        if (!res.ok) throw new Error();
-        return res.json();
-      })
-      .then(data => {
-        if (data && data.length > 0) {
-          setDbEvents(data);
-        }
-      })
-      .catch(err => {
-        console.warn('Hero events load error');
-      });
-  }, []);
-
-  const stackEvents = dbEvents.map(e => ({
+  const stackEvents = events.map(e => ({
     id: e.id,
     title: e.title,
     date: e.date ? new Date(e.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'UPCOMING',
     doors: `Doors ${e.timeFrom || '7:00 PM'}`,
     price: e.ticketTiers && e.ticketTiers.length > 0 ? `LKR ${e.ticketTiers[0].price.toLocaleString()}` : 'Free',
-    countdown: 'Upcoming',
+    countdown: getCountdown(e.date),
     bgGradient: 'linear-gradient(135deg, #1f1c2c, #4a4c84)',
     icon: '🎤',
+    image: e.imageUrl,
     ticketTiers: e.ticketTiers,
     earlyBirdDiscount: e.earlyBirdDiscount,
     earlyBirdLimit: e.earlyBirdLimit,
@@ -114,8 +110,11 @@ function Hero({ onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
 
               {/* Background Card (Tilted behind) */}
               <div className="stack-3d-bg-card">
-                <div className="bg-poster-area" style={{ background: nextCard.bgGradient }}>
-                  <span className="bg-icon">{nextCard.icon}</span>
+                <div 
+                  className="bg-poster-area" 
+                  style={nextCard.image ? { backgroundImage: `url(${nextCard.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: nextCard.bgGradient }}
+                >
+                  {!nextCard.image && <span className="bg-icon">{nextCard.icon}</span>}
                 </div>
               </div>
 
@@ -126,8 +125,11 @@ function Hero({ onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
                 onClick={() => onSelectEvent && onSelectEvent(activeCard)}
               >
                 {/* Poster Image Area */}
-                <div className="fg-poster-area" style={{ background: activeCard.bgGradient }}>
-                  <span className="fg-icon">{activeCard.icon}</span>
+                <div 
+                  className="fg-poster-area" 
+                  style={activeCard.image ? { backgroundImage: `url(${activeCard.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: activeCard.bgGradient }}
+                >
+                  {!activeCard.image && <span className="fg-icon">{activeCard.icon}</span>}
 
                   {/* Pop-out Countdown Badge at bottom-left image border */}
                   <div className="exact-popout-countdown">

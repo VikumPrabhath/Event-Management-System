@@ -2,26 +2,42 @@ import React from 'react';
 import './EventCard.css';
 
 function EventCard({ event, onSelectEvent, onClick, compactMode = false }) {
-  const defaultEvent = {
-    id: 'shina-nayagara',
-    date: 'FRI, JUL 24, 2026',
-    time: 'Doors 7:00 PM',
-    title: 'Musaeus College Auditorium',
-    category: 'Sumihiri Mathakayan Concert',
-    price: 'LKR 4,000.00',
-    countdown: '26d : 07h : 38m',
-    trendingTag: '★ Now Trending 🔥'
+  const getCountdown = (dateString) => {
+    if (!dateString) return 'Upcoming';
+    const eventTime = new Date(dateString).getTime();
+    if (isNaN(eventTime)) return 'Upcoming';
+    
+    const now = new Date().getTime();
+    const distance = eventTime - now;
+    
+    if (distance < 0) {
+      return 'Started / Ended';
+    }
+    
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days}d : ${hours}h : ${minutes}m`;
   };
 
-  // If AdminDashboard passes a different structure, adapt it or use default
+  // Map properties strictly depending on the API response
   const data = {
-    ...defaultEvent,
     ...event,
-    title: event?.title || defaultEvent.title,
-    category: event?.type || event?.category || defaultEvent.category,
-    date: event?.date || defaultEvent.date,
-    price: event?.price || defaultEvent.price,
+    title: event?.title || '',
+    category: event?.category || event?.type || '',
+    date: event?.date ? (isNaN(Date.parse(event.date)) ? event.date : new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()) : '',
+    price: event?.price || (event?.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price.toLocaleString()}` : ''),
+    countdown: getCountdown(event?.date),
+    trendingTag: event?.trendingTag || ''
   };
+
+  // Calculate remaining tickets
+  let remainingTickets = null;
+  if (data.totalCapacity !== undefined && data.ticketsSold !== undefined) {
+    remainingTickets = data.totalCapacity - data.ticketsSold;
+    if (remainingTickets < 0) remainingTickets = 0;
+  }
 
   const handleClick = () => {
     if (onClick) onClick(data);
@@ -55,18 +71,33 @@ function EventCard({ event, onSelectEvent, onClick, compactMode = false }) {
         <h3 className="card-main-title">{data.title}</h3>
         <p className="card-sub-title">{data.category}</p>
 
-        <div className="card-price-row">
+        <div className="card-price-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '5px' }}>
           <div className="price-label-box">
             <span className="from-text">FROM</span>
             <span className="price-value">{data.price}</span>
           </div>
+          
+          {data.earlyBirdDiscount > 0 && (
+            <div style={{ color: '#00ff80', fontSize: '11px', fontWeight: 'bold' }}>
+              🌟 {data.earlyBirdDiscount}% Early Bird Off!
+            </div>
+          )}
+          
+          {remainingTickets !== null && (
+            <div style={{ color: '#ff6a13', fontSize: '12px', fontWeight: 'bold', marginTop: '4px' }}>
+              🎟️ Remaining: {remainingTickets}
+              {remainingTickets === 0 && <span style={{ color: 'red', marginLeft: '5px' }}>SOLD OUT</span>}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Pop-out trending badge at bottom right corner */}
-      <div className="card-popout-corner-badge">
-        {data.trendingTag || '★ Now Trending 🔥'}
-      </div>
+      {data.trendingTag && (
+        <div className="card-popout-corner-badge">
+          {data.trendingTag}
+        </div>
+      )}
 
     </div>
   );

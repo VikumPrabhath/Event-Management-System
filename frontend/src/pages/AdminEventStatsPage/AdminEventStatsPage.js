@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import Header from '../../components/Header/Header';
@@ -9,31 +9,51 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Dummy event data for stats
-  const event = {
-    id: id,
-    title: 'Shina Nayagara Live',
-    date: '3 July 2026',
-    venue: 'Lotus Tower Colombo',
-    status: 'Sold Out',
-    totalRevenue: 'LKR 4,500,000',
-    totalTicketsSold: 850,
-    totalCapacity: 850,
-  };
+  const [eventData, setEventData] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const ticketData = [
-    { name: 'Gold Tickets', sold: 500, total: 500, color: '#f5af19' },
-    { name: 'Platinum Tickets', sold: 350, total: 350, color: '#e5e4e2' }
-  ];
+  useEffect(() => {
+    // Fetch Event Details
+    fetch(`http://localhost:8081/api/events/${id}`)
+      .then(res => res.json())
+      .then(data => setEventData(data))
+      .catch(err => console.error(err));
 
-  const salesTrendData = [
-    { day: 'Mon', sales: 120 },
-    { day: 'Tue', sales: 150 },
-    { day: 'Wed', sales: 180 },
-    { day: 'Thu', sales: 90 },
-    { day: 'Fri', sales: 210 },
-    { day: 'Sat', sales: 100 },
-  ];
+    // Fetch Event Stats
+    fetch(`http://localhost:8081/api/bookings/event/${id}/stats`)
+      .then(res => res.json())
+      .then(data => {
+        setStats(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className={`admin-portal-wrapper ${theme}-mode`}>
+        <Header theme={theme} toggleTheme={toggleTheme} isAdminView={true} />
+        <main className="admin-stats-page-container" style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+          <h2>Loading Analytics...</h2>
+        </main>
+      </div>
+    );
+  }
+
+  if (!eventData || !stats) {
+    return (
+      <div className={`admin-portal-wrapper ${theme}-mode`}>
+        <Header theme={theme} toggleTheme={toggleTheme} isAdminView={true} />
+        <main className="admin-stats-page-container" style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+          <h2>Event or Stats not found.</h2>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={`admin-portal-wrapper ${theme}-mode`}>
@@ -41,10 +61,10 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
       
       <main className="admin-stats-page-container">
         <div className="admin-header">
-          <button className="back-btn" onClick={() => navigate('/admin')}>← Back to Dashboard</button>
+          <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
           <div className="stats-header-info">
-            <h2 className="page-title">{event.title} - Analytics</h2>
-            <span className={`status-badge ${event.status.toLowerCase().replace(' ', '-')}`}>{event.status}</span>
+            <h2 className="page-title">{eventData.title} - Analytics</h2>
+            <span className="status-badge" style={{background: 'var(--primary-color)'}}>ACTIVE</span>
           </div>
         </div>
 
@@ -54,21 +74,21 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
             <div className="stat-icon calendar-icon">🎟️</div>
             <div className="stat-info">
               <span className="stat-title">Tickets Sold</span>
-              <span className="stat-value">{event.totalTicketsSold} / {event.totalCapacity}</span>
+              <span className="stat-value">{stats.totalTicketsSold} / {stats.totalCapacity}</span>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon money-icon">💵</div>
             <div className="stat-info">
               <span className="stat-title">Total Revenue</span>
-              <span className="stat-value">{event.totalRevenue}</span>
+              <span className="stat-value">{stats.totalRevenue}</span>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon ticket-icon">📍</div>
             <div className="stat-info">
               <span className="stat-title">Venue</span>
-              <span className="stat-value" style={{fontSize: '18px'}}>{event.venue}</span>
+              <span className="stat-value" style={{fontSize: '18px'}}>{eventData.venue}</span>
             </div>
           </div>
         </div>
@@ -81,7 +101,7 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={ticketData}
+                    data={stats.ticketData}
                     cx="50%"
                     cy="50%"
                     innerRadius={80}
@@ -89,7 +109,7 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
                     paddingAngle={5}
                     dataKey="sold"
                   >
-                    {ticketData.map((entry, index) => (
+                    {stats.ticketData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -102,7 +122,7 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
                 </PieChart>
               </ResponsiveContainer>
               <div className="pie-legend">
-                {ticketData.map((entry, index) => (
+                {stats.ticketData.map((entry, index) => (
                   <div key={index} className="legend-item">
                     <span className="legend-color" style={{backgroundColor: entry.color}}></span>
                     {entry.name}: {entry.sold} Sold
@@ -114,10 +134,10 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
 
           {/* Sales Trend Bar Chart */}
           <div className="admin-section chart-section">
-            <h3>📈 Sales Velocity (Last 6 Days)</h3>
+            <h3>📈 Sales Velocity</h3>
             <div className="chart-container" style={{ height: '300px' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={salesTrendData}>
+                <BarChart data={stats.chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#333' : '#eee'} vertical={false} />
                   <XAxis dataKey="day" stroke={theme === 'dark' ? '#ccc' : '#666'} />
                   <YAxis stroke={theme === 'dark' ? '#ccc' : '#666'} />

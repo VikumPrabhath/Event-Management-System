@@ -55,16 +55,14 @@ function AdminDashboard({ theme, toggleTheme }) {
   const upcomingEvents = allEvents.filter(e => e.status === 'Upcoming');
   const historyEvents = allEvents.filter(e => e.status === 'History');
 
-  // Dummy chart data
-  const chartData = [
-    { name: 'Mon', sales: 4000 },
-    { name: 'Tue', sales: 3000 },
-    { name: 'Wed', sales: 5000 },
-    { name: 'Thu', sales: 2780 },
-    { name: 'Fri', sales: 8900 },
-    { name: 'Sat', sales: 12000 },
-    { name: 'Sun', sales: 14000 },
-  ];
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8081/api/bookings/sales-chart')
+      .then(res => res.json())
+      .then(data => setChartData(data))
+      .catch(err => console.error('Error fetching sales chart:', err));
+  }, []);
 
   // Helper to check if two dates are the same day
   const isSameDay = (d1, d2) => {

@@ -17,10 +17,15 @@ public class Booking {
     private String eventId;
     private String eventTitle;
 
-    private int goldCount;
-    private int platinumCount;
-    private int goldTableCount;
-    private int platinumTableCount;
+    // Dynamic selected tickets (TierName -> Quantity)
+    private java.util.Map<String, Integer> selectedTiers;
+
+    // Customer Tracking
+    private String customerFirstName;
+    private String customerLastName;
+    private String customerEmail;
+    private String customerPhone;
+    private String customerNic;
 
     private double totalAmount;
     private String paymentMethod;
