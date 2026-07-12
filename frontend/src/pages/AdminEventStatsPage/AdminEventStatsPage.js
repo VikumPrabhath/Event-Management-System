@@ -11,6 +11,7 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
 
   const [eventData, setEventData] = useState(null);
   const [stats, setStats] = useState(null);
+  const [attendees, setAttendees] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +32,57 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
         console.error(err);
         setLoading(false);
       });
+
+    // Fetch Attendees
+    fetch(`http://localhost:8081/api/bookings/event/${id}/attendees`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setAttendees(data);
+        }
+      })
+      .catch(err => console.error(err));
   }, [id]);
+
+  const downloadCSV = () => {
+    if (!attendees || attendees.length === 0) return;
+    
+    // Define CSV headers
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Booking ID,First Name,Last Name,Email,Phone,NIC,Total Paid,Status,Tickets\n";
+
+    attendees.forEach(b => {
+      // Format tickets array into a string
+      let ticketsStr = "";
+      if (b.selectedTiers) {
+        ticketsStr = Object.entries(b.selectedTiers)
+          .map(([tier, qty]) => `${tier}(${qty})`)
+          .join(" | ");
+      }
+      
+      const row = [
+        b.id,
+        b.customerFirstName || "",
+        b.customerLastName || "",
+        b.customerEmail || "",
+        b.customerPhone || "",
+        b.customerNic || "",
+        b.totalAmount || 0,
+        b.status || "",
+        ticketsStr
+      ].map(field => `"${field}"`).join(","); // Escape with quotes
+
+      csvContent += row + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `event-${id}-attendees.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   if (loading) {
     return (
@@ -151,6 +202,62 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+
+        {/* Attendees List Section */}
+        <div className="admin-section attendees-section" style={{ marginTop: '30px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <h3>👥 Attendees & Bookings</h3>
+            <button className="export-csv-btn" onClick={downloadCSV}>
+              📥 Export CSV
+            </button>
+          </div>
+          
+          <div className="attendees-table-wrapper" style={{ overflowX: 'auto', background: theme === 'dark' ? '#1a1b23' : '#fff', borderRadius: '12px', border: `1px solid ${theme === 'dark' ? '#333' : '#eee'}` }}>
+            {attendees.length > 0 ? (
+              <table className="attendees-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: theme === 'dark' ? '#222' : '#f8f9fa', borderBottom: `2px solid ${theme === 'dark' ? '#333' : '#eee'}` }}>
+                    <th style={{ padding: '12px 15px', color: theme === 'dark' ? '#ccc' : '#666' }}>Name</th>
+                    <th style={{ padding: '12px 15px', color: theme === 'dark' ? '#ccc' : '#666' }}>Contact</th>
+                    <th style={{ padding: '12px 15px', color: theme === 'dark' ? '#ccc' : '#666' }}>Tickets</th>
+                    <th style={{ padding: '12px 15px', color: theme === 'dark' ? '#ccc' : '#666' }}>Paid</th>
+                    <th style={{ padding: '12px 15px', color: theme === 'dark' ? '#ccc' : '#666' }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendees.map(attendee => (
+                    <tr key={attendee.id} style={{ borderBottom: `1px solid ${theme === 'dark' ? '#333' : '#eee'}` }}>
+                      <td style={{ padding: '12px 15px', fontWeight: 'bold' }}>
+                        {attendee.customerFirstName} {attendee.customerLastName}
+                      </td>
+                      <td style={{ padding: '12px 15px' }}>
+                        <div style={{ fontSize: '13px' }}>{attendee.customerEmail}</div>
+                        <div style={{ fontSize: '12px', color: '#888' }}>{attendee.customerPhone}</div>
+                      </td>
+                      <td style={{ padding: '12px 15px' }}>
+                        {attendee.selectedTiers && Object.entries(attendee.selectedTiers).map(([tier, qty]) => (
+                          qty > 0 && <span key={tier} style={{ display: 'inline-block', background: 'rgba(255, 106, 19, 0.1)', color: '#ff6a13', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', marginRight: '5px' }}>
+                            {tier}: {qty}
+                          </span>
+                        ))}
+                      </td>
+                      <td style={{ padding: '12px 15px', fontWeight: 'bold' }}>
+                        LKR {attendee.totalAmount?.toLocaleString()}
+                      </td>
+                      <td style={{ padding: '12px 15px' }}>
+                        <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', background: attendee.status === 'Confirmed' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(241, 196, 15, 0.2)', color: attendee.status === 'Confirmed' ? '#2ecc71' : '#f1c40f' }}>
+                          {attendee.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div style={{ padding: '30px', textAlign: 'center', color: '#888' }}>No attendees yet.</div>
+            )}
           </div>
         </div>
 

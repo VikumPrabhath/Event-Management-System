@@ -175,4 +175,10 @@ public class BookingController {
 
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/event/{eventId}/attendees")
+    public ResponseEntity<List<Booking>> getEventAttendees(@PathVariable String eventId) {
+        List<Booking> bookings = bookingRepository.findByEventId(eventId);
+        return ResponseEntity.ok(bookings);
+    }
 }
