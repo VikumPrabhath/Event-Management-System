@@ -102,6 +102,56 @@ body.dark-theme .form-row label { color: #e0e0e0; }
   background: #fafafa;
 }
 
+.banner-file-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px dashed #d0d3dd;
+  border-radius: 10px;
+  background: #fafafa;
+  color: #1a1b4b;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.banner-file-input::file-selector-button {
+  margin-right: 12px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff6a13, #ff8b3d);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.banner-file-input::-webkit-file-upload-button {
+  margin-right: 12px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff6a13, #ff8b3d);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body.dark-theme .banner-file-input {
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
+}
+
+body.dark-theme .banner-file-input::file-selector-button,
+body.dark-theme .banner-file-input::-webkit-file-upload-button {
+  background: linear-gradient(135deg, #ff6a13, #e0560a);
+}
+
+.banner-file-input:hover,
+.banner-file-input:focus {
+  border-color: #ff6a13;
+  outline: none;
+}
+
 body.dark-theme .form-row input, 
 body.dark-theme .form-row select, 
 body.dark-theme .form-row textarea {
@@ -171,6 +221,69 @@ body.dark-theme .upload-box {
   gap: 15px;
   margin-bottom: 15px;
   font-size: 13px;
+}
+
+.tier-input-group {
+  flex: 1;
+}
+
+.tier-name-group {
+  flex: 1.5;
+}
+
+.tier-capacity-group {
+  max-width: 140px;
+}
+
+.tier-price-group {
+  max-width: 180px;
+}
+
+.tier-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dcdce2;
+  border-radius: 10px;
+  background: #fafafa;
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tier-input:focus {
+  outline: none;
+  border-color: #ff6a13;
+  box-shadow: 0 0 0 3px rgba(255, 106, 19, 0.12);
+}
+
+body.dark-theme .tier-input {
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
+}
+
+body.dark-theme .tier-input::placeholder {
+  color: #888;
+}
+
+.tier-remove-group {
+  flex: 0 0 auto;
+}
+
+.tier-remove-btn {
+  background: linear-gradient(135deg, #ff4d4d, #d93b3b);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tier-remove-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(217, 59, 59, 0.2);
 }
 
 .tier-label {

@@ -252,7 +252,7 @@ function AddEventPage({ theme, toggleTheme, user }) {
                     type="file" 
                     accept="image/*"
                     onChange={handleImageFileChange}
-                    style={{ background: 'transparent', padding: '8px 0', border: 'none' }}
+                    className="banner-file-input"
                   />
                 </div>
                 <div className="form-row">
@@ -286,39 +286,42 @@ function AddEventPage({ theme, toggleTheme, user }) {
                 </div>
                 
                 {ticketTiers.map((tier, index) => (
-                  <div key={index} className="ticket-tier-row" style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
-                    <div style={{ flex: 1.5 }}>
+                  <div key={index} className="ticket-tier-row">
+                    <div className="tier-input-group tier-name-group">
                       <input 
                         type="text" 
                         placeholder="Tier Name (e.g. VIP)" 
                         value={tier.name}
                         onChange={(e) => handleTierChange(index, 'name', e.target.value)}
                         required 
+                        className="tier-input tier-name-input"
                       />
                     </div>
-                    <div style={{ flex: 1 }}>
+                    <div className="tier-input-group tier-capacity-group">
                       <input 
                         type="number" 
                         placeholder="Qty" 
                         value={tier.capacity || ''}
                         onChange={(e) => handleTierChange(index, 'capacity', e.target.value)}
                         required 
+                        className="tier-input tier-qty-input"
                       />
                     </div>
-                    <div style={{ flex: 1.2 }}>
+                    <div className="tier-input-group tier-price-group">
                       <input 
                         type="number" 
                         placeholder="Price (LKR)" 
                         value={tier.price || ''}
                         onChange={(e) => handleTierChange(index, 'price', e.target.value)}
                         required 
+                        className="tier-input tier-price-input"
                       />
                     </div>
-                    <div>
+                    <div className="tier-remove-group">
                       <button 
                         type="button" 
                         onClick={() => handleRemoveTier(index)}
-                        style={{ background: '#ff4d4d', color: '#fff', border: 'none', borderRadius: '4px', padding: '6px 10px', cursor: 'pointer' }}
+                        className="tier-remove-btn"
                       >
                         ✕
                       </button>
