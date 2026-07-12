@@ -13,5 +13,4 @@ frontend/.env
 # OS files
 .DS_Store
 Thumbs.db
-
-Backend/event-management-system/src/main/resources/application.properties
+ 
