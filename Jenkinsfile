@@ -73,19 +73,8 @@ pipeline {
     post {
         always {
             // Clean up on Jenkins VM (just in case)
-            sh 'docker stop backend-container || true'
-            sh 'docker rm backend-container || true'
-            sh 'docker stop frontend-container || true'
-            sh 'docker rm frontend-container || true'
-
-            // Clean up on App Server
-            sh '''
-                ssh app-server@192.168.45.139 "
-                    docker stop backend-container frontend-container || true
-                    docker rm backend-container frontend-container || true
-                    docker system prune -f || true
-                "
-            '''
+            sh 'docker stop backend-container frontend-container || true'
+            sh 'docker rm backend-container frontend-container || true'
         }
     }
 }
