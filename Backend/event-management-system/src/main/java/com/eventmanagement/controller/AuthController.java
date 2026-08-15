@@ -1,5 +1,9 @@
 package com.eventmanagement.controller;
 
+import com.eventmanagement.dto.ForgotPasswordRequest;
+import com.eventmanagement.dto.ResetPasswordRequest;
+import com.eventmanagement.dto.VerifyCodeRequest;
+import com.eventmanagement.service.PasswordResetService;
 import com.eventmanagement.dto.LoginRequest;
 import com.eventmanagement.dto.RegisterRequest;
 import com.eventmanagement.entity.User;
@@ -21,6 +25,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
     // LOGIN ENDPOINT
     @PostMapping("/login")
@@ -57,4 +62,47 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
         }
     }
+
+    // Forgot Password - Send verification code
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        try {
+            passwordResetService.sendVerificationCode(request.getEmail());
+            return ResponseEntity.ok("Verification code sent to your email!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Verify Code
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verifyCode(@RequestBody VerifyCodeRequest request) {
+        try {
+            boolean isValid = passwordResetService.verifyCode(request.getEmail(), request.getCode());
+            if (isValid) {
+                return ResponseEntity.ok("Code verified successfully!");
+            } else {
+                return ResponseEntity.badRequest().body("Invalid or expired verification code!");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Reset Password
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            passwordResetService.resetPassword(
+                    request.getEmail(),
+                    request.getCode(),
+                    request.getNewPassword(),
+                    request.getConfirmPassword()
+            );
+            return ResponseEntity.ok("Password reset successfully!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

@@ -148,7 +148,7 @@ git pull origin main
 
 * **After you make changes and save files, upload them:**
 git add .
-git commit -m "Describe what you changed here"
+git commit -m "Test Jenkins"
 git push origin main
 
 * **If you get a "Merge Conflict":** Don't panic. IntelliJ/VS Code will highlight the conflicting lines. Keep the correct code, delete the `<<<<<<< HEAD` and `>>>>>>>` markers, save, and push again.

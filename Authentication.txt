@@ -1,0 +1,11 @@
+Database
+User Name - vikumprabhath4_db_user
+Password - MyNewSecurePass123!
+
+
+
+Connection String
+mongodb+srv://vikumprabhath4_db_user:MyNewSecurePass123!@cluster0.b7a1gzg.mongodb.net/?appName=Cluster0
+
+
+mongodb+srv://vikumprabhath4_db_user:MyNewSecurePass123!@cluster0.b7a1gzg.mongodb.net/?retryWrites=true&w=majority

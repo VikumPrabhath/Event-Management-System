@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")   // Standard REST API path
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000") // React එකට අවසර දීම
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
