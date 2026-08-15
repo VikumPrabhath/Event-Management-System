@@ -10,6 +10,7 @@ import AdminEventStatsPage from './pages/AdminEventStatsPage/AdminEventStatsPage
 import UserDashboard from './pages/UserDashboard/UserDashboard';
 import OrganizerDashboard from './pages/OrganizerPortal/OrganizerDashboard';
 import AuthModal from './components/AuthModal/AuthModal';
+import ForgotPasswordModal from './components/ForgotPasswordModal/ForgotPasswordModal';
 import OrganizerAuthModal from './components/OrganizerAuthModal/OrganizerAuthModal';
 import './App.css';
 
@@ -19,6 +20,7 @@ function AppContent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [showOrganizerAuthModal, setShowOrganizerAuthModal] = useState(false);
   const [theme, setTheme] = useState('dark');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
@@ -187,7 +189,20 @@ function AppContent() {
       <AuthModal 
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onLoginSuccess={handleLoginSuccess}
+        onLoginSuccess={handleLoginSuccess} 
+        onForgotPassword={() => {
+          setShowAuthModal(false);
+          setShowForgotPasswordModal(true);
+        }}
+      />
+      
+      <ForgotPasswordModal
+        isOpen={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
+        onBackToLogin={() => {
+          setShowForgotPasswordModal(false);
+          setShowAuthModal(true);
+        }}
       />
 
       <OrganizerAuthModal 

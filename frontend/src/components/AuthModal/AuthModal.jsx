@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './AuthModal.css';
 
-function AuthModal({ isOpen, onClose, onLoginSuccess }) {
+function AuthModal({ isOpen, onClose, onLoginSuccess, onForgotPassword }) {
   const [mode, setMode] = useState('login'); // 'login' or 'register'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -300,6 +300,26 @@ function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   </div>
                 </>
               )}
+
+              {/* ✅ FIXED: Forgot Password button now calls onForgotPassword correctly */}
+              <div style={{ textAlign: 'right', marginBottom: '12px' }}>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    onForgotPassword(); // ✅ This closes AuthModal and opens ForgotPasswordModal
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#7c5cfc',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Forgot Password?
+                </button>
+              </div>
 
               <button type="submit" className="auth-submit-btn">
                 {mode === 'login' ? 'Sign In' : 'Create Account'}
