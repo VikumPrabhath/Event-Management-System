@@ -58,6 +58,22 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
     }
   }, [currentUser?.id]);
 
+  const handleLogout =async () => {
+    try {
+          await fetch('http://localhost:8081/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include', // Send session cookie
+      });
+    } catch (err) {
+      console.error('Logout request failed:', err);
+    } finally {
+      if (onLogout) {
+        onLogout();
+      }
+      navigate('/');
+    }
+  };
+
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (currentUser.id === 'anonymous') {
@@ -150,7 +166,7 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
           <button className="offers-btn">
             Offers
           </button>
-          <button className="logout-btn" onClick={onLogout} title="Sign Out">
+          <button className="logout-btn" onClick={handleLogout} title="Sign Out">
             Logout
           </button>
         </div>
