@@ -1,5 +1,6 @@
 package com.eventmanagement.controller;
 
+import com.eventmanagement.service.EventService;
 import com.eventmanagement.entity.Event;
 import com.eventmanagement.dto.EventSummaryDTO;
 import com.eventmanagement.repository.EventRepository;
@@ -14,10 +15,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000")
 public class EventController {
 
     private final EventRepository eventRepository;
+    private final EventService eventService;
 
     @GetMapping("/summary")
     public ResponseEntity<List<EventSummaryDTO>> getEventSummaries() {
@@ -42,30 +44,53 @@ public class EventController {
         return ResponseEntity.ok(summaries);
     }
 
+    // GET ALL EVENTS (with optional category filter)
     @GetMapping
-    public ResponseEntity<List<Event>> getAllEvents() {
-        return ResponseEntity.ok(eventRepository.findAll());
+    public ResponseEntity<List<Event>> getAllEvents(
+            @RequestParam(required = false) String category) {
+        List<Event> events;
+        if (category != null && !category.isEmpty()) {
+            events = eventService.getEventsByCategory(category);
+        } else {
+            events = eventService.getAllEvents();
+        }
+        return ResponseEntity.ok(events);
     }
 
+    @GetMapping("/organizer/{organizerId}")
+    public ResponseEntity<List<Event>> getEventsByOrganizerId(@PathVariable String organizerId) {
+        return ResponseEntity.ok(eventRepository.findByOrganizerId(organizerId));
+    }
+
+    // GET EVENT BY ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Event> getEventById(@PathVariable String id) {
+        return eventService.getEventById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // CREATE EVENT
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody Event event) {
         try {
-            Event savedEvent = eventRepository.save(event);
+            Event savedEvent = eventService.createEvent(event);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable String id) {
-        return eventRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // UPDATE EVENT
+    @PutMapping("/{id}")
+    public ResponseEntity<Event> updateEvent(@PathVariable String id, @RequestBody Event event) {
+        return ResponseEntity.ok(eventService.updateEvent(id, event));
     }
 
-    @GetMapping("/organizer/{organizerId}")
-    public ResponseEntity<List<Event>> getEventsByOrganizerId(@PathVariable String organizerId) {
-        return ResponseEntity.ok(eventRepository.findByOrganizerId(organizerId));
+    // DELETE EVENT
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteEvent(@PathVariable String id) {
+        eventService.deleteEvent(id);
     }
 }

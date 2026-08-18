@@ -21,6 +21,9 @@ public class Event {
     private String timeFrom;
     private String timeTo;
     private String imageUrl;
+    private Double price;
+    private String organizer;
+    private int availableTickets;
     private String trendingTag; // e.g. status: trending, fast-selling, popular play
 
     private List<TicketTier> ticketTiers = new ArrayList<>();
