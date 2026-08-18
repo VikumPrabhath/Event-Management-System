@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './OrganizerAuthModal.css';
 
 function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
@@ -10,12 +10,45 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
 
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Helper function to get current date in "Mon YYYY" format
+  const getCurrentDate = () => {
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[now.getMonth()]} ${now.getFullYear()}`;
+  };
+
+  // Reset form state when modal opens or closes
+  useEffect(() => {
+    if (!isOpen) {
+      setErrorMsg('');
+      setSuccessMsg('');
+      setLoading(false);
+      setEmail('');
+      setPassword('');
+      setOrgName('');
+      setPhone('');
+      setMode('login');
+    }
+  }, [isOpen]);
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    setErrorMsg('');
+    setSuccessMsg('');
+    setEmail('');
+    setPassword('');
+    setOrgName('');
+    setPhone('');
+  };
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
     setLoading(true);
 
     try {
@@ -29,11 +62,20 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
 
         if (!res.ok) {
           const errText = await res.text();
+
+          if (errText.includes('pending approval') || errText.includes('already registered')) {
+            throw new Error('Your organizer account is pending Admin approval!');
+          }
           throw new Error(errText || 'Registration failed.');
         }
 
-        alert('Registration successful! Please wait for Admin approval before logging in.');
+        setSuccessMsg('Registration successful! Please wait for Admin approval before logging in.');
         setMode('login');
+        // Clear form fields after successful registration
+        setOrgName('');
+        setPhone('');
+        setEmail('');
+        setPassword('');
       } else {
         const payload = { email, password };
         const res = await fetch('http://localhost:8081/api/organizers/login', {
@@ -44,6 +86,10 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
 
         if (!res.ok) {
           const errText = await res.text();
+
+          if (errText.includes('pending approval')) {
+            throw new Error('Your organizer account is pending Admin approval!');
+          }
           throw new Error(errText || 'Invalid credentials or pending approval.');
         }
 
@@ -54,7 +100,7 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
           name: data.orgName,
           email: data.email,
           role: 'Organizer',
-          joinedDate: 'Jun 2026'
+          joinedDate: getCurrentDate()
         };
         onLoginSuccess(sessionData);
         onClose();
@@ -79,20 +125,33 @@ function OrganizerAuthModal({ isOpen, onClose, onLoginSuccess }) {
         <div className="org-tabs">
           <button 
             className={`org-tab ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => setMode('login')}
+            onClick={() => handleModeChange('login')}
           >
             Organizer Login
           </button>
           <button 
             className={`org-tab ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => setMode('register')}
+            onClick={() => handleModeChange('register')}
           >
             Register Organization
           </button>
         </div>
 
+        {/* Success message box */}
+        {successMsg && (
+          <div className="org-success-banner">
+            {successMsg}
+          </div>
+        )}
+
+        {/* Error message box */}
+        {errorMsg && (
+          <div className="org-error-banner">
+            {errorMsg}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="org-form">
-          {errorMsg && <div className="org-error-banner" style={{color: '#ff7979', marginBottom: '14px', fontSize: '13px'}}>{errorMsg}</div>}
           {mode === 'register' && (
             <>
               <div className="form-group">
