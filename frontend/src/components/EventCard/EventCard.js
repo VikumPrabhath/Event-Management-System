@@ -29,7 +29,8 @@ function EventCard({ event, onSelectEvent, onClick, compactMode = false }) {
     date: event?.date ? (isNaN(Date.parse(event.date)) ? event.date : new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()) : '',
     price: event?.price || (event?.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price.toLocaleString()}` : ''),
     countdown: getCountdown(event?.date),
-    trendingTag: event?.trendingTag || ''
+    trendingTag: event?.trendingTag || '',
+    image: event?.imageUrl || event?.image || ''
   };
 
   // Calculate remaining tickets
@@ -44,11 +45,14 @@ function EventCard({ event, onSelectEvent, onClick, compactMode = false }) {
     else if (onSelectEvent) onSelectEvent(data);
   };
 
+  // Get the image source
+  const imageSrc = data.image || '/assets/default-event.jpg';
+
   return (
     <div className={`event-card-modern ${compactMode ? 'compact-card' : ''}`} onClick={handleClick}>
       
       {/* Poster Image Area */}
-      <div className="card-poster-area" style={event?.image ? {backgroundImage: `url(${event.image})`, backgroundSize: 'cover', backgroundPosition: 'center'} : {}}>
+      <div className="card-poster-area" style={imageSrc ? {backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center'} : {}}>
         {!event?.image && (
           <div className="poster-inner-graphic">
             <span className="graphic-icon">🎤</span>

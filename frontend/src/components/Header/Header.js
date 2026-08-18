@@ -91,10 +91,14 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
         </>
       ) : (
         <>
-          <div className="admin-header-title">Admin Dashboard</div>
+          <div className="admin-header-title">
+            {user?.role === 'Organizer' ? `${user.name || 'Organizer'} Dashboard` : 'Admin Dashboard'}
+          </div>
           <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className="admin-avatar">👤</div>
-            <span className="admin-welcome">Welcome Admin</span>
+            <span className="admin-welcome">
+              {user?.role === 'Organizer' ? `Welcome ${user.name || 'Organizer'}` : 'Welcome Admin'}
+            </span>
             <button className="theme-toggle-btn admin-theme-btn" onClick={toggleTheme}>
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>

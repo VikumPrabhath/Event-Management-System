@@ -53,6 +53,11 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
 
   const totalSold = events.reduce((sum, e) => sum + (e.ticketsSold || 0), 0);
 
+  // Navigate with user data in state
+  const handleEventClick = (eventId) => {
+    navigate(`/organizer/event/${eventId}/stats`, { state: { user } });
+  };
+
   return (
     <div className={`organizer-portal-wrapper ${theme}-mode`}>
       {/* Header */}
@@ -120,9 +125,10 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
                   key={event.id} 
                   event={{
                     ...event, 
-                    price: event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free'
+                    price: event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free',
+                    imageUrl: event.imageUrl || '/assets/default-event.jpg'
                   }} 
-                  onClick={() => navigate(`/organizer/event/${event.id}/stats`)} 
+                  onClick={() => handleEventClick(event.id)} 
                   compactMode={true} 
                 />
               ))}
@@ -144,9 +150,10 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
                   key={event.id} 
                   event={{
                     ...event, 
-                    price: event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free'
+                    price: event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free',
+                    imageUrl: event.imageUrl || '/assets/default-event.jpg'
                   }} 
-                  onClick={() => navigate(`/organizer/event/${event.id}/stats`)} 
+                  onClick={() => handleEventClick(event.id)} 
                   compactMode={true} 
                 />
               ))}
