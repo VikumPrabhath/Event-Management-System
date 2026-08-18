@@ -7,6 +7,7 @@ import AdminLogin from './pages/AdminPortal/AdminLogin';
 import AdminDashboard from './pages/AdminPortal/AdminDashboard';
 import AddEventPage from './pages/AddEventPage/AddEventPage';
 import AdminEventStatsPage from './pages/AdminEventStatsPage/AdminEventStatsPage';
+import OrganizerEventStatsPage from './pages/OrganizerEventStatsPage/OrganizerEventStatsPage';
 import UserDashboard from './pages/UserDashboard/UserDashboard';
 import OrganizerDashboard from './pages/OrganizerPortal/OrganizerDashboard';
 import AuthModal from './components/AuthModal/AuthModal';
@@ -173,6 +174,17 @@ function AppContent() {
               <AdminEventStatsPage theme={theme} toggleTheme={toggleTheme} />
             ) : (
               <Navigate to="/admin" replace />
+            )
+          } 
+        />
+
+        <Route 
+          path="/organizer/event/:id/stats" 
+          element={
+            isAdminAuthenticated || user?.role === 'Organizer' ? (
+              <OrganizerEventStatsPage theme={theme} toggleTheme={toggleTheme} />
+            ) : (
+              <Navigate to="/organizer" replace />
             )
           } 
         />
