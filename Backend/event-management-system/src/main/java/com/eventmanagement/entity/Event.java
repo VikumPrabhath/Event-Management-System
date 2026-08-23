@@ -33,4 +33,5 @@ public class Event {
     private int ticketsSold = 0;
     
     private String organizerId;
+    private String status = "ACTIVE";
 }

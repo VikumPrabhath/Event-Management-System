@@ -18,4 +18,5 @@ public class EventSummaryDTO {
     private int earlyBirdLimit;
     private int ticketsSold;
     private int totalCapacity;
+    private String status;
 }

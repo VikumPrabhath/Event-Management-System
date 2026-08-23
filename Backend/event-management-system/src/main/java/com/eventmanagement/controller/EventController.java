@@ -39,6 +39,7 @@ public class EventController {
             dto.setTicketsSold(e.getTicketsSold());
             int totalCap = e.getTicketTiers() == null ? 0 : e.getTicketTiers().stream().mapToInt(com.eventmanagement.entity.TicketTier::getCapacity).sum();
             dto.setTotalCapacity(totalCap);
+            dto.setStatus(e.getStatus() == null ? "ACTIVE" : e.getStatus());
             return dto;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(summaries);
@@ -85,6 +86,13 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable String id, @RequestBody Event event) {
         return ResponseEntity.ok(eventService.updateEvent(id, event));
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Event> cancelEvent(@PathVariable String id) {
+        return eventService.cancelEvent(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // DELETE EVENT
