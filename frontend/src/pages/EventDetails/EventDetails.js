@@ -77,6 +77,8 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
     return <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`} style={{display:'flex', justifyContent:'center', alignItems:'center', minHeight:'100vh', color: theme === 'dark' ? '#fff' : '#000'}}><h2>Event Not Found</h2></div>;
   }
 
+  const isCancelled = currentEvent.status === 'CANCELLED';
+
   return (
     <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`}>
       <Header theme={theme} toggleTheme={toggleTheme} user={user} onOpenAuth={onOpenAuth} />
@@ -116,9 +118,13 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
                   <label>SECS</label>
                 </div>
               </div>
-              <button className="orange-book-now-btn" onClick={() => onOpenBooking(currentEvent)}>
-                Book Now
-              </button>
+              {isCancelled ? (
+                <span className="event-cancelled-notice">EVENT CANCELLED</span>
+              ) : (
+                <button className="orange-book-now-btn" onClick={() => onOpenBooking(currentEvent)}>
+                  Book Now
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -186,9 +192,12 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
                   </div>
                 )}
               </div>
-              <button className="buy-tickets-orange-btn" onClick={() => onOpenBooking(currentEvent)}>
-                Buy Tickets &gt;&gt;
-              </button>
+              {!isCancelled && (
+                <button className="buy-tickets-orange-btn" onClick={() => onOpenBooking(currentEvent)}>
+                  Buy Tickets &gt;&gt;
+                </button>
+              )}
+              {isCancelled && <div className="event-cancelled-notice sidebar-notice">This event has been cancelled.</div>}
             </div>
           </div>
         </div>

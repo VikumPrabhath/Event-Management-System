@@ -13,6 +13,7 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
   const [stats, setStats] = useState(null);
   const [attendees, setAttendees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
     // Fetch Event Details
@@ -84,6 +85,22 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
     document.body.removeChild(link);
   };
 
+  const handleCancelEvent = async () => {
+    if (!window.confirm('Cancel this event? Existing bookings will be marked as cancelled.')) return;
+
+    setCancelLoading(true);
+    try {
+      const res = await fetch(`http://localhost:8081/api/events/${id}/cancel`, { method: 'PUT' });
+      if (!res.ok) throw new Error('Failed to cancel event.');
+      setEventData(await res.json());
+      setAttendees(prev => prev.map(booking => ({ ...booking, status: 'Cancelled' })));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className={`admin-portal-wrapper ${theme}-mode`}>
@@ -115,8 +132,15 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
           <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
           <div className="stats-header-info">
             <h2 className="page-title">{eventData.title} - Analytics</h2>
-            <span className="status-badge" style={{background: 'var(--primary-color)'}}>ACTIVE</span>
+            <span className="status-badge" style={{background: eventData.status === 'CANCELLED' ? '#c0392b' : 'var(--primary-color)'}}>
+              {eventData.status || 'ACTIVE'}
+            </span>
           </div>
+          {(eventData.status || 'ACTIVE') !== 'CANCELLED' && (
+            <button className="cancel-event-btn" onClick={handleCancelEvent} disabled={cancelLoading}>
+              {cancelLoading ? 'Cancelling...' : 'Cancel Event'}
+            </button>
+          )}
         </div>
 
         {/* Key Metrics */}

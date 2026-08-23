@@ -30,6 +30,9 @@ public class BookingController {
                 return ResponseEntity.badRequest().body("Event not found");
             }
             Event event = optionalEvent.get();
+            if ("CANCELLED".equalsIgnoreCase(event.getStatus())) {
+                return ResponseEntity.badRequest().body("This event has been cancelled and is no longer available for booking");
+            }
 
             int totalTicketsRequested = 0;
 

@@ -34,6 +34,7 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
   const [editEarlyBirdLimit, setEditEarlyBirdLimit] = useState(0);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
     // Fetch Event Details
@@ -199,6 +200,22 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
     }
   };
 
+  const handleCancelEvent = async () => {
+    if (!window.confirm('Cancel this event? Existing bookings will be marked as cancelled.')) return;
+
+    setCancelLoading(true);
+    try {
+      const res = await fetch(`http://localhost:8081/api/events/${id}/cancel`, { method: 'PUT' });
+      if (!res.ok) throw new Error('Failed to cancel event.');
+      const cancelledEvent = await res.json();
+      setEventData(cancelledEvent);
+    } catch (err) {
+      setEditError(err.message);
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className={`organizer-stats-wrapper ${theme}-mode`}>
@@ -231,10 +248,17 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
             <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
             <div className="stats-header-info">
               <h2 className="page-title">{eventData.title} - Analytics</h2>
-              <span className="status-badge active-badge">ACTIVE</span>
+              <span className={`status-badge ${eventData.status === 'CANCELLED' ? 'cancelled-badge' : 'active-badge'}`}>
+                {eventData.status || 'ACTIVE'}
+              </span>
             </div>
           </div>
           <div className="stats-header-right">
+            {(eventData.status || 'ACTIVE') !== 'CANCELLED' && (
+              <button className="cancel-event-btn" onClick={handleCancelEvent} disabled={cancelLoading}>
+                {cancelLoading ? 'Cancelling...' : 'Cancel Event'}
+              </button>
+            )}
             <button className="edit-event-btn" onClick={() => setShowEditForm(!showEditForm)}>
               {showEditForm ? '✕ Close Edit' : '✎ Edit Event'}
             </button>

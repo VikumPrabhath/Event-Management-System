@@ -12,6 +12,21 @@
   gap: 20px;
 }
 
+.cancel-event-btn {
+  background: #c0392b;
+  border: none;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cancel-event-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .pie-legend {
   display: flex;
   justify-content: center;
