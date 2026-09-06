@@ -28,7 +28,6 @@ public class AuthController {
     private final PasswordResetService passwordResetService;
 
     // LOGIN ENDPOINT
-//login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpSession session) {
         try {
