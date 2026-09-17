@@ -401,3 +401,75 @@ body.dark-theme .section-hint {
   gap: 10px;
   margin-top: 20px;
 }
+
+/* Organizer Approval Section */
+.organizers-approval-section {
+  margin-top: 40px;
+}
+
+.organizers-list-table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.empty-org-msg {
+  color: #8b90a0;
+}
+
+.organizers-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.organizers-list-table th,
+.organizers-list-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eaeaea;
+  color: #1a1b4b;
+}
+
+.organizers-list-table th {
+  color: #ff6a13;
+}
+
+body.dark-theme .organizers-list-table th,
+body.dark-theme .organizers-list-table td {
+  border-bottom: 1px solid #1e202c;
+  color: #e0e6ed;
+}
+
+body.dark-theme .organizers-list-table th {
+  color: #ff9f43;
+}
+
+.org-status {
+  font-weight: bold;
+}
+
+.org-status.approved {
+  color: #2ecc71;
+}
+
+.org-status.pending {
+  color: #f1c40f;
+}
+
+.approve-btn {
+  background: #ff6a13;
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.approve-btn:hover {
+  background: #e0560a;
+}
+
+.no-action {
+  color: #8b90a0;
+}

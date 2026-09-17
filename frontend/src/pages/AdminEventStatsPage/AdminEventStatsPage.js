@@ -12,6 +12,7 @@ function AdminEventStatsPage({ theme, toggleTheme }) {
   const [eventData, setEventData] = useState(null);
   const [stats, setStats] = useState(null);
   const [attendees, setAttendees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
 
