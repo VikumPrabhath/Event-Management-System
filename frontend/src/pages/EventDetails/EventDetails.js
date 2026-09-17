@@ -5,7 +5,7 @@ import Footer from '../../components/Footer/Footer';
 import MapWidget from '../../components/MapWidget/MapWidget';
 import './EventDetails.css';
 
-function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenAuth }) {
+function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenAuth, refreshTrigger }) {
   const { id } = useParams();
   const [currentEvent, setCurrentEvent] = useState(null);
   const [organizer, setOrganizer] = useState(null);
@@ -32,9 +32,8 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
         console.error("Failed to load event details", err);
         setLoading(false);
       });
-  }, [id]);
+  }, [id, refreshTrigger]);
 
-  // Calculate Remaining Capacity
   let remainingTickets = null;
   if (currentEvent && currentEvent.ticketTiers) {
     const totalCap = currentEvent.ticketTiers.reduce((sum, tier) => sum + tier.capacity, 0);
@@ -70,138 +69,136 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
   }, [currentEvent]);
 
   if (loading) {
-    return <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`} style={{display:'flex', justifyContent:'center', alignItems:'center', minHeight:'100vh', color: theme === 'dark' ? '#fff' : '#000'}}><h2>Loading Event Details...</h2></div>;
+    return <div className={`event-details-loader ${theme}-mode`}>
+      <div className="spinner"></div>
+      <h2>Loading Experience...</h2>
+    </div>;
   }
 
   if (!currentEvent) {
-    return <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`} style={{display:'flex', justifyContent:'center', alignItems:'center', minHeight:'100vh', color: theme === 'dark' ? '#fff' : '#000'}}><h2>Event Not Found</h2></div>;
+    return <div className={`event-details-loader ${theme}-mode`}><h2>Experience Not Found</h2></div>;
   }
 
   const isCancelled = currentEvent.status === 'CANCELLED';
+  const defaultImage = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=2070";
+  const bgImage = currentEvent.imageUrl || defaultImage;
 
   return (
-    <div className={`event-details-page ${theme === 'dark' ? 'dark-theme-details' : 'light-theme-details'}`}>
+    <div className={`event-details-wrapper ${theme}-mode`}>
       <Header theme={theme} toggleTheme={toggleTheme} user={user} onOpenAuth={onOpenAuth} />
 
-      {/* Top Banner & Floating Poster Section */}
-      <div className="details-hero-section">
-        <div className="hero-cover-bg">
-          <div className="cover-overlay"></div>
-          {/* Overlapping Square Poster Card on right */}
-          <div className="floating-poster-card">
-            <div className="poster-inner-img">
-              <span className="poster-title-preview">{currentEvent.title}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Left Countdown Bar underneath hero cover */}
-        <div className="countdown-bar-wrapper">
-          <div className="countdown-bar-container">
-            <div className="bar-left-content">
-              <h3 className="countdown-headline">Event <span className="light-sub">will start on</span></h3>
-              <div className="countdown-boxes">
-                <div className="time-box">
-                  <span className="num">{timeLeft.days}</span>
-                  <label>DAYS</label>
-                </div>
-                <div className="time-box">
-                  <span className="num">{timeLeft.hours}</span>
-                  <label>HOURS</label>
-                </div>
-                <div className="time-box">
-                  <span className="num">{timeLeft.minutes}</span>
-                  <label>MINS</label>
-                </div>
-                <div className="time-box">
-                  <span className="num">{timeLeft.seconds}</span>
-                  <label>SECS</label>
-                </div>
-              </div>
-              {isCancelled ? (
-                <span className="event-cancelled-notice">EVENT CANCELLED</span>
-              ) : (
-                <button className="orange-book-now-btn" onClick={() => onOpenBooking(currentEvent)}>
-                  Book Now
-                </button>
+      <main className="event-details-main">
+        {/* Immersive Hero Section */}
+        <section className="event-hero" style={{ backgroundImage: `url(${bgImage})` }}>
+          <div className="hero-gradient-overlay"></div>
+          
+          <div className="hero-content">
+            <div className="event-badges">
+              <span className="badge category-badge">{currentEvent.type || currentEvent.category || 'General'}</span>
+              {currentEvent.earlyBirdDiscount > 0 && (
+                <span className="badge discount-badge">🔥 {currentEvent.earlyBirdDiscount}% OFF</span>
               )}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Details Body */}
-      <div className="details-main-body">
-        <div className="body-grid-container">
-          {/* Left Column Info */}
-          <div className="main-info-column">
-            <h1 className="event-main-title">{currentEvent.title}</h1>
-            <p className="event-subtitle">{currentEvent.type || currentEvent.category}</p>
-
-            <div className="lineup-box">
-              <strong>About Event</strong>
-              <p>{currentEvent.description || 'Join us for an amazing experience!'}</p>
-            </div>
-
-            <div className="event-meta-list">
-              <div className="meta-row">
-                <span className="meta-bullet">📅</span>
-                <span>{currentEvent.date} {currentEvent.timeFrom}</span>
-              </div>
-              <div className="meta-row">
-                <span className="meta-bullet">📍</span>
-                <span>{currentEvent.venue || 'TBA'}</span>
-              </div>
-              <div className="meta-row">
-                <span className="meta-bullet">Organized by</span>
-                <span>{organizer ? (organizer.companyName || organizer.name) : (currentEvent.organizerId || 'Event Organizer')}</span>
-              </div>
-            </div>
-
-            {remainingTickets !== null && (
-              <div style={{ marginTop: '15px', padding: '15px', background: 'rgba(255, 106, 19, 0.1)', border: '1px solid #ff6a13', borderRadius: '8px' }}>
-                <strong style={{ color: '#ff6a13', fontSize: '18px' }}>🎟️ Remaining Tickets: {remainingTickets}</strong>
-                {remainingTickets === 0 && <span style={{ marginLeft: '10px', color: 'red', fontWeight: 'bold' }}>SOLD OUT</span>}
-              </div>
-            )}
+            <h1 className="hero-title">{currentEvent.title}</h1>
+            <p className="hero-subtitle">
+              By {organizer ? (organizer.companyName || organizer.name) : (currentEvent.organizerId || 'Premium Organizer')}
+            </p>
             
-            {currentEvent.earlyBirdDiscount > 0 && (
-              <div style={{ marginTop: '10px', color: '#00ff80', fontWeight: 'bold' }}>
-                🌟 Early Bird Discount: {currentEvent.earlyBirdDiscount}% OFF!
+            <div className="hero-countdown-glass">
+              <h3 className="glass-title">Starts In</h3>
+              <div className="countdown-grid">
+                <div className="time-unit"><span className="val">{timeLeft.days}</span><span className="lbl">DAYS</span></div>
+                <div className="time-unit"><span className="val">{timeLeft.hours}</span><span className="lbl">HOURS</span></div>
+                <div className="time-unit"><span className="val">{timeLeft.minutes}</span><span className="lbl">MINS</span></div>
+                <div className="time-unit"><span className="val">{timeLeft.seconds}</span><span className="lbl">SECS</span></div>
               </div>
-            )}
-
-            {/* Map Widget embedded cleanly */}
-            <MapWidget venue={currentEvent.venue || 'TBA'} />
+            </div>
           </div>
+        </section>
 
-          {/* Right Column Ticket Prices */}
-          <div className="prices-sidebar-column">
-            <div className="ticket-prices-card">
-              <h2 className="prices-card-title">Ticket <span className="light-sub">Prices</span></h2>
-              <div className="tiers-table">
-                {currentEvent.ticketTiers && currentEvent.ticketTiers.length > 0 ? currentEvent.ticketTiers.map((tier, idx) => (
-                  <div key={idx} className="tier-item-row">
-                    <span className="tier-name-label">{tier.name}</span>
-                    <span className="tier-price-value">{tier.price} LKR</span>
+        {/* Content Layout */}
+        <div className="details-content-grid">
+          <div className="details-left">
+            <div className="glass-panel about-panel">
+              <h2>About The Experience</h2>
+              <p className="description-text">{currentEvent.description || 'Join us for an unforgettable, mesmerizing experience filled with life, energy, and memories.'}</p>
+            </div>
+
+            <div className="glass-panel info-panel">
+              <h2>Event Information</h2>
+              <div className="info-list">
+                <div className="info-item">
+                  <div className="icon">🗓️</div>
+                  <div className="info-text">
+                    <strong>Date & Time</strong>
+                    <span>{currentEvent.date} at {currentEvent.timeFrom}</span>
                   </div>
-                )) : (
-                  <div className="tier-item-row">
-                    <span className="tier-name-label">General Admission</span>
-                    <span className="tier-price-value">Free / TBA</span>
+                </div>
+                <div className="info-item">
+                  <div className="icon">📍</div>
+                  <div className="info-text">
+                    <strong>Venue</strong>
+                    <span>{currentEvent.venue || 'TBA'}</span>
+                  </div>
+                </div>
+                {remainingTickets !== null && (
+                  <div className="info-item ticket-status-item">
+                    <div className="icon">🎟️</div>
+                    <div className="info-text">
+                      <strong>Availability</strong>
+                      <span className={remainingTickets === 0 ? 'sold-out-text' : 'available-text'}>
+                        {remainingTickets === 0 ? 'SOLD OUT' : `${remainingTickets} Tickets Remaining`}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
-              {!isCancelled && (
-                <button className="buy-tickets-orange-btn" onClick={() => onOpenBooking(currentEvent)}>
-                  Buy Tickets &gt;&gt;
+            </div>
+
+            <div className="glass-panel map-panel">
+              <h2>Location</h2>
+              <div className="map-wrapper">
+                <MapWidget venue={currentEvent.venue || 'TBA'} />
+              </div>
+            </div>
+          </div>
+
+          <div className="details-right">
+            <div className="glass-panel ticket-panel">
+              <div className="ticket-header-art"></div>
+              <h2>Select Your Tier</h2>
+              <div className="tiers-list">
+                {currentEvent.ticketTiers && currentEvent.ticketTiers.length > 0 ? (
+                  currentEvent.ticketTiers.map((tier, idx) => (
+                    <div key={idx} className="tier-card">
+                      <div className="tier-info">
+                        <span className="tier-name">{tier.name}</span>
+                        <span className="tier-cap">Capacity: {tier.capacity}</span>
+                      </div>
+                      <div className="tier-price">{tier.price.toLocaleString()} LKR</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="tier-card">
+                    <div className="tier-info"><span className="tier-name">General Admission</span></div>
+                    <div className="tier-price">Free / TBA</div>
+                  </div>
+                )}
+              </div>
+
+              {isCancelled ? (
+                <div className="cancelled-alert">🚨 This event has been cancelled.</div>
+              ) : remainingTickets === 0 ? (
+                <button className="sold-out-btn" disabled>SOLD OUT</button>
+              ) : (
+                <button className="action-btn premium-buy-btn" onClick={() => onOpenBooking(currentEvent)}>
+                  Reserve Tickets Now
                 </button>
               )}
-              {isCancelled && <div className="event-cancelled-notice sidebar-notice">This event has been cancelled.</div>}
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>
