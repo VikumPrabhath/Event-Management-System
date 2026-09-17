@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import StripeCheckout from 'react-stripe-checkout';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import './TicketBooking.css';
@@ -301,15 +302,27 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
                         </div>
                       </label>
 
-                      {/* Mock VISA Card UI */}
+                      {/* Stripe Checkout Mock VISA */}
                       {paymentMethod === 'visa' && (
-                        <div className="mock-card-details" style={{ margin: '0 0 15px 0', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                          <input type="text" placeholder="Card Number (0000 0000 0000 0000)" required style={{ width: '100%', marginBottom: '10px', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
-                          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                            <input type="text" placeholder="MM/YY" required style={{ width: '50%', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
-                            <input type="text" placeholder="CVV" required style={{ width: '50%', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
-                          </div>
-                          <input type="text" placeholder="Cardholder Name" required style={{ width: '100%', padding: '10px', borderRadius: '4px', border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                        <div className="mock-card-details" style={{ margin: '0 0 15px 0', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
+                          <StripeCheckout
+                            stripeKey="pk_test_TYooMQauvdEDq54NiTphI7jx" // Public Stripe test key
+                            token={async (token) => {
+                              // We just use this as a trigger to proceed with the booking!
+                              const syntheticEvent = { preventDefault: () => {} };
+                              await handleFinalSubmit(syntheticEvent);
+                            }}
+                            name={eventTitle}
+                            description={`Total: ${grandTotal.toLocaleString()} LKR`}
+                            amount={grandTotal * 100} // Stripe expects amounts in cents
+                            currency="LKR"
+                            email={formData.email}
+                            allowRememberMe={false}
+                          >
+                            <button type="button" className="orange-pay-btn" style={{ width: '100%' }}>
+                              Pay Securely with Stripe
+                            </button>
+                          </StripeCheckout>
                         </div>
                       )}
 
