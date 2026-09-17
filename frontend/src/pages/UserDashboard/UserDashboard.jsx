@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Search, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
 import EventsMegaMenu from '../../components/EventsMegaMenu/EventsMegaMenu';
 import './UserDashboard.css';
 
@@ -153,8 +154,8 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
             )}
           </Link>
           <nav className="header-nav-links">
-            <div className="nav-dropdown" onClick={() => setShowMegaMenu(!showMegaMenu)} style={{cursor: 'pointer'}}>
-              <span>Events {showMegaMenu ? '⌃' : '▾'}</span>
+            <div className="nav-dropdown" onClick={() => setShowMegaMenu(!showMegaMenu)} style={{cursor: 'pointer', display: 'flex', alignItems: 'center'}}>
+              <span>Events {showMegaMenu ? <ChevronUp size={14} style={{marginLeft: '4px'}} /> : <ChevronDown size={14} style={{marginLeft: '4px'}} />}</span>
             </div>
             <Link to="/" className="nav-item">Concerts</Link>
             <Link to="/" className="nav-item">Art & Drama</Link>
@@ -230,7 +231,7 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
               {/* Search & Sort Controls Bar */}
               <div className="controls-row">
                 <div className="search-input-wrapper">
-                  <span className="search-icon">🔍</span>
+                  <span className="search-icon" style={{display: 'flex', alignItems: 'center'}}><Search size={16} /></span>
                   <input 
                     type="text" 
                     placeholder="Search by event, venue or booking ID..."
@@ -239,8 +240,8 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
                     className="tickets-search-input"
                   />
                 </div>
-                <button className="sort-dropdown-btn">
-                  ↑↓ Newest
+                <button className="sort-dropdown-btn" style={{display: 'flex', alignItems: 'center'}}>
+                  <ArrowUpDown size={14} style={{marginRight: '6px'}} /> Newest
                 </button>
               </div>
 
