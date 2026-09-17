@@ -216,6 +216,86 @@ public class BookingController {
         return ResponseEntity.ok(stats);
     }
 
+    @PutMapping("/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable String bookingId) {
+        try {
+            Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
+            if (optionalBooking.isEmpty()) {
+                return ResponseEntity.badRequest().body("Booking not found");
+            }
+            Booking booking = optionalBooking.get();
+
+            if ("CANCELLED".equalsIgnoreCase(booking.getStatus())) {
+                return ResponseEntity.badRequest().body("Booking is already cancelled");
+            }
+
+            Optional<Event> optionalEvent = eventRepository.findById(booking.getEventId());
+            if (optionalEvent.isEmpty()) {
+                return ResponseEntity.badRequest().body("Associated event not found");
+            }
+            Event event = optionalEvent.get();
+
+            // Calculate days until event
+            java.time.LocalDate eventDate = java.time.LocalDate.parse(event.getDate());
+            java.time.LocalDate today = java.time.LocalDate.now();
+            long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(today, eventDate);
+
+            if (daysBetween < 0) {
+                 return ResponseEntity.badRequest().body("Cannot cancel a past event booking");
+            }
+
+            double refundPercentage = 0.0;
+            if (daysBetween > 7) {
+                refundPercentage = 80.0;
+            } else if (daysBetween >= 3) {
+                refundPercentage = 50.0;
+            } else {
+                refundPercentage = 0.0;
+            }
+
+            double refundAmount = booking.getTotalAmount() * (refundPercentage / 100.0);
+            
+            // Release tickets back to event
+            int totalTicketsToRelease = 0;
+            if (booking.getSelectedTiers() != null) {
+                for (Map.Entry<String, Integer> entry : booking.getSelectedTiers().entrySet()) {
+                    String tierName = entry.getKey();
+                    int qty = entry.getValue();
+
+                    if (qty > 0) {
+                        for (TicketTier tier : event.getTicketTiers()) {
+                            if (tier.getName().equals(tierName)) {
+                                tier.setSold(Math.max(0, tier.getSold() - qty));
+                                totalTicketsToRelease += qty;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            event.setTicketsSold(Math.max(0, event.getTicketsSold() - totalTicketsToRelease));
+            eventRepository.save(event);
+
+            // Update Booking
+            booking.setStatus("CANCELLED");
+            booking.setRefundPercentage(refundPercentage);
+            booking.setRefundAmount(refundAmount);
+            booking.setCancelledAt(LocalDateTime.now());
+            Booking savedBooking = bookingRepository.save(booking);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Booking cancelled successfully");
+            response.put("refundPercentage", refundPercentage);
+            response.put("refundAmount", refundAmount);
+            response.put("booking", savedBooking);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error cancelling booking: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/event/{eventId}/attendees")
     public ResponseEntity<List<Booking>> getEventAttendees(@PathVariable String eventId) {
         List<Booking> bookings = bookingRepository.findByEventId(eventId);

@@ -584,3 +584,20 @@
   font-size: 11px;
   color: #6c7283;
 }
+
+.cancel-booking-btn {
+  background-color: transparent;
+  color: #ff4757;
+  border: 1px solid #ff4757;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-booking-btn:hover {
+  background-color: #ff4757;
+  color: #ffffff;
+}

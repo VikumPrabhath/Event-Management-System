@@ -41,23 +41,27 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
 
   useEffect(() => {
     if (currentUser?.email) {
-      setLoadingBookings(true);
-      fetch(`http://localhost:8081/api/bookings/history/email/${currentUser.email}`)
-        .then(res => {
-          if (!res.ok) throw new Error('Failed to load bookings');
-          return res.json();
-        })
-        .then(data => {
-          setBookings(data);
-        })
-        .catch(err => {
-          console.error(err);
-        })
-        .finally(() => {
-          setLoadingBookings(false);
-        });
+      fetchBookings();
     }
   }, [currentUser?.email]);
+
+  const fetchBookings = () => {
+    setLoadingBookings(true);
+    fetch(`http://localhost:8081/api/bookings/history/email/${currentUser.email}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load bookings');
+        return res.json();
+      })
+      .then(data => {
+        setBookings(data);
+      })
+      .catch(err => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoadingBookings(false);
+      });
+  };
 
   const handleLogout =async () => {
     try {
@@ -132,6 +136,28 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
     }
     return true;
   });
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to cancel this booking? Refund amount will be calculated based on the days remaining before the event starts (e.g. >7 days = 80%, 3-7 days = 50%, <3 days = 0%).")) {
+      return;
+    }
+    
+    try {
+      const res = await fetch(`http://localhost:8081/api/bookings/${bookingId}/cancel`, {
+        method: 'PUT'
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.message || data || 'Cancellation failed');
+      }
+      
+      alert(`Booking cancelled successfully!\nRefund Amount: LKR ${data.refundAmount}\nRefund Percentage: ${data.refundPercentage}%`);
+      fetchBookings(); // Refresh the list
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -304,13 +330,23 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
                           {b.paymentMethod && <div><span>Payment Method:</span> <span>{b.paymentMethod.toUpperCase()}</span></div>}
                           {b.id && <div><span>Booking ID:</span> <span>#{b.id.substring(b.id.length - 8).toUpperCase()}</span></div>}
                         </div>
-                        <div className="booking-card-footer">
-                          <span className="booking-date-display">
-                            {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString() : 'N/A'}
-                          </span>
-                          <span className="booking-amount-display">
-                            {b.totalAmount ? b.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'} LKR
-                          </span>
+                        <div className="booking-card-footer" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                          <div>
+                            <span className="booking-date-display" style={{display: 'block'}}>
+                              {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString() : 'N/A'}
+                            </span>
+                            <span className="booking-amount-display">
+                              {b.totalAmount ? b.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'} LKR
+                            </span>
+                          </div>
+                          {(!b.status || b.status.toLowerCase() === 'confirmed') && (
+                            <button 
+                              className="cancel-booking-btn"
+                              onClick={() => handleCancelBooking(b.id)}
+                            >
+                              Cancel Booking
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
