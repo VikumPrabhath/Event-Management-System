@@ -39,9 +39,9 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
   }, [user]);
 
   useEffect(() => {
-    if (currentUser?.id && currentUser.id !== 'anonymous') {
+    if (currentUser?.email) {
       setLoadingBookings(true);
-      fetch(`http://localhost:8081/api/bookings/history/${currentUser.id}`)
+      fetch(`http://localhost:8081/api/bookings/history/email/${currentUser.email}`)
         .then(res => {
           if (!res.ok) throw new Error('Failed to load bookings');
           return res.json();
@@ -56,7 +56,7 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
           setLoadingBookings(false);
         });
     }
-  }, [currentUser?.id]);
+  }, [currentUser?.email]);
 
   const handleLogout =async () => {
     try {

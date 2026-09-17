@@ -21,6 +21,8 @@ public class BookingController {
 
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
+    private final com.eventmanagement.service.EmailService emailService;
+    private final com.eventmanagement.service.QRCodeGenerator qrCodeGenerator;
 
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
@@ -35,6 +37,7 @@ public class BookingController {
             }
 
             int totalTicketsRequested = 0;
+            StringBuilder tierDetails = new StringBuilder();
 
             if (booking.getSelectedTiers() != null) {
                 for (Map.Entry<String, Integer> entry : booking.getSelectedTiers().entrySet()) {
@@ -52,6 +55,7 @@ public class BookingController {
                                 return ResponseEntity.badRequest().body("Not enough tickets available for tier: " + tierName);
                             }
                             tier.setSold(tier.getSold() + qtyRequested);
+                            tierDetails.append(qtyRequested).append("x ").append(tierName).append(" ");
                             break;
                         }
                     }
@@ -70,6 +74,33 @@ public class BookingController {
             }
             booking.setBookingDate(LocalDateTime.now());
             Booking savedBooking = bookingRepository.save(booking);
+
+            // Generate QR Code & Send Email Async
+            try {
+                String qrContent = "Booking ID: " + savedBooking.getId() + "\n"
+                        + "Name: " + booking.getCustomerFirstName() + " " + booking.getCustomerLastName() + "\n"
+                        + "Event: " + event.getTitle() + "\n"
+                        + "Tiers: " + tierDetails.toString() + "\n"
+                        + "Total Paid: " + booking.getTotalAmount();
+                byte[] qrCodeImage = qrCodeGenerator.generateQRCodeImage(qrContent, 250, 250);
+                
+                emailService.sendBookingConfirmationWithQR(
+                        booking.getCustomerEmail(),
+                        booking.getCustomerFirstName(),
+                        event.getTitle(),
+                        savedBooking.getId(),
+                        event.getDate(),
+                        event.getTimeFrom(),
+                        event.getVenue(),
+                        tierDetails.toString(),
+                        String.format("%.2f", booking.getTotalAmount()),
+                        event.getImageUrl(),
+                        qrCodeImage
+                );
+            } catch (Exception ex) {
+                System.err.println("Error generating QR or sending email: " + ex.getMessage());
+            }
+
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBooking);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -79,6 +110,12 @@ public class BookingController {
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<Booking>> getBookingsByUserId(@PathVariable String userId) {
         List<Booking> bookings = bookingRepository.findByUserId(userId);
+        return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("/history/email/{email}")
+    public ResponseEntity<List<Booking>> getBookingsByEmail(@PathVariable String email) {
+        List<Booking> bookings = bookingRepository.findByCustomerEmail(email);
         return ResponseEntity.ok(bookings);
     }
 
