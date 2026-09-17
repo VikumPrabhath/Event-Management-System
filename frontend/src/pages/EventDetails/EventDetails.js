@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Calendar, MapPin, Ticket, AlertTriangle, Zap } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import MapWidget from '../../components/MapWidget/MapWidget';
@@ -96,7 +97,7 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
             <div className="event-badges">
               <span className="badge category-badge">{currentEvent.type || currentEvent.category || 'General'}</span>
               {currentEvent.earlyBirdDiscount > 0 && (
-                <span className="badge discount-badge">🔥 {currentEvent.earlyBirdDiscount}% OFF</span>
+                <span className="badge discount-badge" style={{display: 'flex', alignItems: 'center'}}><Zap size={14} style={{marginRight: '4px'}} /> {currentEvent.earlyBirdDiscount}% OFF</span>
               )}
             </div>
             <h1 className="hero-title">{currentEvent.title}</h1>
@@ -128,14 +129,14 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
               <h2>Event Information</h2>
               <div className="info-list">
                 <div className="info-item">
-                  <div className="icon">🗓️</div>
+                  <div className="icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Calendar size={20} color="#ff6a13" /></div>
                   <div className="info-text">
                     <strong>Date & Time</strong>
                     <span>{currentEvent.date} at {currentEvent.timeFrom}</span>
                   </div>
                 </div>
                 <div className="info-item">
-                  <div className="icon">📍</div>
+                  <div className="icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><MapPin size={20} color="#ff6a13" /></div>
                   <div className="info-text">
                     <strong>Venue</strong>
                     <span>{currentEvent.venue || 'TBA'}</span>
@@ -143,7 +144,7 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
                 </div>
                 {remainingTickets !== null && (
                   <div className="info-item ticket-status-item">
-                    <div className="icon">🎟️</div>
+                    <div className="icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Ticket size={20} color="#ff6a13" /></div>
                     <div className="info-text">
                       <strong>Availability</strong>
                       <span className={remainingTickets === 0 ? 'sold-out-text' : 'available-text'}>
@@ -187,7 +188,7 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
               </div>
 
               {isCancelled ? (
-                <div className="cancelled-alert">🚨 This event has been cancelled.</div>
+                <div className="cancelled-alert" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><AlertTriangle size={18} style={{marginRight: '6px'}} /> This event has been cancelled.</div>
               ) : remainingTickets === 0 ? (
                 <button className="sold-out-btn" disabled>SOLD OUT</button>
               ) : (

@@ -31,6 +31,11 @@ public class Booking {
     private String paymentMethod;
     private String status; // Confirmed, Expired, Cancelled
 
+    // Cancellation & Refund Tracking
+    private double refundAmount;
+    private double refundPercentage;
+    private LocalDateTime cancelledAt;
+
     @CreatedDate
     private LocalDateTime bookingDate = LocalDateTime.now();
 }
