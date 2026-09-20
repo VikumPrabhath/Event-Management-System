@@ -29,6 +29,10 @@ function AppContent() {
     return localStorage.getItem('admin_authenticated') === 'true';
   });
 
+  const handleOpenAuth = () => {
+    setShowAuthModal(true);
+  };
+
   const handleAdminLogin = (val) => {
     setIsAdminAuthenticated(val);
     localStorage.setItem('admin_authenticated', val ? 'true' : 'false');
@@ -131,6 +135,7 @@ function AppContent() {
               onOpenBooking={handleOpenBooking}
               theme={theme}
               toggleTheme={toggleTheme}
+              onOpenAuth={handleOpenAuth}
               refreshTrigger={refreshTrigger}
             />
           } 
@@ -213,6 +218,7 @@ function AppContent() {
           event={selectedEvent} 
           onClose={handleCloseBooking} 
           user={user}
+          onOpenAuth={handleOpenAuth}
         />
       )}
 
