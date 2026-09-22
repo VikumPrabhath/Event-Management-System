@@ -10,6 +10,7 @@ import AdminEventStatsPage from './pages/AdminEventStatsPage/AdminEventStatsPage
 import OrganizerEventStatsPage from './pages/OrganizerEventStatsPage/OrganizerEventStatsPage';
 import UserDashboard from './pages/UserDashboard/UserDashboard';
 import OrganizerDashboard from './pages/OrganizerPortal/OrganizerDashboard';
+import OrganizerProfile from './pages/OrganizerPortal/OrganizerProfile';
 import AuthModal from './components/AuthModal/AuthModal';
 import ForgotPasswordModal from './components/ForgotPasswordModal/ForgotPasswordModal';
 import OrganizerAuthModal from './components/OrganizerAuthModal/OrganizerAuthModal';
@@ -180,6 +181,21 @@ function AppContent() {
             user?.role === 'Organizer' ? (
               <OrganizerDashboard 
                 user={user} 
+                onLogout={handleLogout} 
+                theme={theme} 
+                toggleTheme={toggleTheme} 
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          } 
+        />
+
+        <Route 
+          path="/organizer/profile" 
+          element={
+            user?.role === 'Organizer' ? (
+              <OrganizerProfile 
                 onLogout={handleLogout} 
                 theme={theme} 
                 toggleTheme={toggleTheme} 
