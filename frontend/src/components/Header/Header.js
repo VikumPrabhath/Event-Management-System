@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Search, ChevronDown, ChevronUp, User, Sun, Moon } from 'lucide-react';
 import EventsMegaMenu from '../EventsMegaMenu/EventsMegaMenu';
 import './Header.css';
 
@@ -43,7 +44,7 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
         <>
           {/* Integrated Search Bar in Header */}
           <form onSubmit={handleSearchSubmit} className="header-search-form">
-            <span className="header-search-icon">🔍</span>
+            <span className="header-search-icon"><Search size={16} /></span>
             <input 
               type="text" 
               placeholder="Search concerts, theater..." 
@@ -57,9 +58,9 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
             <button 
               className="nav-link nav-dropdown-trigger" 
               onClick={() => setShowMegaMenu(!showMegaMenu)}
-              style={{background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit'}}
+              style={{background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center'}}
             >
-              Events {showMegaMenu ? '⌃' : '▾'}
+              Events {showMegaMenu ? <ChevronUp size={14} style={{marginLeft: '4px'}} /> : <ChevronDown size={14} style={{marginLeft: '4px'}} />}
             </button>
             <a href="#concerts" className="nav-link">Concerts</a>
             <a href="#theater" className="nav-link">Theater</a>
@@ -95,12 +96,12 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
             {user?.role === 'Organizer' ? `${user.name || 'Organizer'} Dashboard` : 'Admin Dashboard'}
           </div>
           <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div className="admin-avatar">👤</div>
+            <div className="admin-avatar" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><User size={20} color="#8b90a0" /></div>
             <span className="admin-welcome">
               {user?.role === 'Organizer' ? `Welcome ${user.name || 'Organizer'}` : 'Welcome Admin'}
             </span>
-            <button className="theme-toggle-btn admin-theme-btn" onClick={toggleTheme}>
-              {theme === 'dark' ? '☀️' : '🌙'}
+            <button className="theme-toggle-btn admin-theme-btn" onClick={toggleTheme} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <button 
               onClick={() => {

@@ -21,6 +21,8 @@ public class BookingController {
 
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
+    private final com.eventmanagement.service.EmailService emailService;
+    private final com.eventmanagement.service.QRCodeGenerator qrCodeGenerator;
 
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
@@ -35,6 +37,7 @@ public class BookingController {
             }
 
             int totalTicketsRequested = 0;
+            StringBuilder tierDetails = new StringBuilder();
 
             if (booking.getSelectedTiers() != null) {
                 for (Map.Entry<String, Integer> entry : booking.getSelectedTiers().entrySet()) {
@@ -52,6 +55,7 @@ public class BookingController {
                                 return ResponseEntity.badRequest().body("Not enough tickets available for tier: " + tierName);
                             }
                             tier.setSold(tier.getSold() + qtyRequested);
+                            tierDetails.append(qtyRequested).append("x ").append(tierName).append(" ");
                             break;
                         }
                     }
@@ -70,6 +74,33 @@ public class BookingController {
             }
             booking.setBookingDate(LocalDateTime.now());
             Booking savedBooking = bookingRepository.save(booking);
+
+            // Generate QR Code & Send Email Async
+            try {
+                String qrContent = "Booking ID: " + savedBooking.getId() + "\n"
+                        + "Name: " + booking.getCustomerFirstName() + " " + booking.getCustomerLastName() + "\n"
+                        + "Event: " + event.getTitle() + "\n"
+                        + "Tiers: " + tierDetails.toString() + "\n"
+                        + "Total Paid: " + booking.getTotalAmount();
+                byte[] qrCodeImage = qrCodeGenerator.generateQRCodeImage(qrContent, 250, 250);
+                
+                emailService.sendBookingConfirmationWithQR(
+                        booking.getCustomerEmail(),
+                        booking.getCustomerFirstName(),
+                        event.getTitle(),
+                        savedBooking.getId(),
+                        event.getDate(),
+                        event.getTimeFrom(),
+                        event.getVenue(),
+                        tierDetails.toString(),
+                        String.format("%.2f", booking.getTotalAmount()),
+                        event.getImageUrl(),
+                        qrCodeImage
+                );
+            } catch (Exception ex) {
+                System.err.println("Error generating QR or sending email: " + ex.getMessage());
+            }
+
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBooking);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -79,6 +110,12 @@ public class BookingController {
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<Booking>> getBookingsByUserId(@PathVariable String userId) {
         List<Booking> bookings = bookingRepository.findByUserId(userId);
+        return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("/history/email/{email}")
+    public ResponseEntity<List<Booking>> getBookingsByEmail(@PathVariable String email) {
+        List<Booking> bookings = bookingRepository.findByCustomerEmail(email);
         return ResponseEntity.ok(bookings);
     }
 
@@ -177,6 +214,86 @@ public class BookingController {
         stats.put("ticketData", ticketData);
 
         return ResponseEntity.ok(stats);
+    }
+
+    @PutMapping("/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable String bookingId) {
+        try {
+            Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
+            if (optionalBooking.isEmpty()) {
+                return ResponseEntity.badRequest().body("Booking not found");
+            }
+            Booking booking = optionalBooking.get();
+
+            if ("CANCELLED".equalsIgnoreCase(booking.getStatus())) {
+                return ResponseEntity.badRequest().body("Booking is already cancelled");
+            }
+
+            Optional<Event> optionalEvent = eventRepository.findById(booking.getEventId());
+            if (optionalEvent.isEmpty()) {
+                return ResponseEntity.badRequest().body("Associated event not found");
+            }
+            Event event = optionalEvent.get();
+
+            // Calculate days until event
+            java.time.LocalDate eventDate = java.time.LocalDate.parse(event.getDate());
+            java.time.LocalDate today = java.time.LocalDate.now();
+            long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(today, eventDate);
+
+            if (daysBetween < 0) {
+                 return ResponseEntity.badRequest().body("Cannot cancel a past event booking");
+            }
+
+            double refundPercentage = 0.0;
+            if (daysBetween > 7) {
+                refundPercentage = 80.0;
+            } else if (daysBetween >= 3) {
+                refundPercentage = 50.0;
+            } else {
+                refundPercentage = 0.0;
+            }
+
+            double refundAmount = booking.getTotalAmount() * (refundPercentage / 100.0);
+            
+            // Release tickets back to event
+            int totalTicketsToRelease = 0;
+            if (booking.getSelectedTiers() != null) {
+                for (Map.Entry<String, Integer> entry : booking.getSelectedTiers().entrySet()) {
+                    String tierName = entry.getKey();
+                    int qty = entry.getValue();
+
+                    if (qty > 0) {
+                        for (TicketTier tier : event.getTicketTiers()) {
+                            if (tier.getName().equals(tierName)) {
+                                tier.setSold(Math.max(0, tier.getSold() - qty));
+                                totalTicketsToRelease += qty;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            event.setTicketsSold(Math.max(0, event.getTicketsSold() - totalTicketsToRelease));
+            eventRepository.save(event);
+
+            // Update Booking
+            booking.setStatus("CANCELLED");
+            booking.setRefundPercentage(refundPercentage);
+            booking.setRefundAmount(refundAmount);
+            booking.setCancelledAt(LocalDateTime.now());
+            Booking savedBooking = bookingRepository.save(booking);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Booking cancelled successfully");
+            response.put("refundPercentage", refundPercentage);
+            response.put("refundAmount", refundAmount);
+            response.put("booking", savedBooking);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error cancelling booking: " + e.getMessage());
+        }
     }
 
     @GetMapping("/event/{eventId}/attendees")

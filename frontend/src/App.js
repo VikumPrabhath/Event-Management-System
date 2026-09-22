@@ -20,6 +20,7 @@ function AppContent() {
   const [connectionStatus, setConnectionStatus] = useState('checking');
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [showOrganizerAuthModal, setShowOrganizerAuthModal] = useState(false);
@@ -27,6 +28,10 @@ function AppContent() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     return localStorage.getItem('admin_authenticated') === 'true';
   });
+
+  const handleOpenAuth = () => {
+    setShowAuthModal(true);
+  };
 
   const handleAdminLogin = (val) => {
     setIsAdminAuthenticated(val);
@@ -88,6 +93,11 @@ function AppContent() {
     setShowBookingModal(true);
   };
 
+  const handleCloseBooking = () => {
+    setShowBookingModal(false);
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   return (
     <div className={`App ${theme}-theme`}>
       <Routes>
@@ -125,6 +135,8 @@ function AppContent() {
               onOpenBooking={handleOpenBooking}
               theme={theme}
               toggleTheme={toggleTheme}
+              onOpenAuth={handleOpenAuth}
+              refreshTrigger={refreshTrigger}
             />
           } 
         />
@@ -147,6 +159,17 @@ function AppContent() {
               <AddEventPage theme={theme} toggleTheme={toggleTheme} user={user} />
             ) : (
               <Navigate to="/admin" replace />
+            )
+          } 
+        />
+
+        <Route 
+          path="/organizer/add-event" 
+          element={
+            user?.role === 'Organizer' ? (
+              <AddEventPage theme={theme} toggleTheme={toggleTheme} user={user} />
+            ) : (
+              <Navigate to="/organizer" replace />
             )
           } 
         />
@@ -193,8 +216,9 @@ function AppContent() {
       {showBookingModal && (
         <TicketBooking 
           event={selectedEvent} 
-          onClose={() => setShowBookingModal(false)} 
+          onClose={handleCloseBooking} 
           user={user}
+          onOpenAuth={handleOpenAuth}
         />
       )}
 

@@ -222,44 +222,44 @@ function AdminDashboard({ theme, toggleTheme }) {
         )}
 
         {/* Organizer Verification Section */}
-        <div className="admin-section organizers-approval-section" style={{marginTop: '40px', background: '#12131a', padding: '20px', borderRadius: '12px', border: '1px solid #1e202c'}}>
+        <div className="admin-section organizers-approval-section">
           <h3>Organizer Approvals</h3>
           <p className="section-hint">Review and approve organizer registrations so they can log in.</p>
-          <div className="organizers-list-table" style={{marginTop: '20px', overflowX: 'auto'}}>
+          <div className="organizers-list-table-container">
             {organizers.length === 0 ? (
-              <p style={{color: '#8b90a0'}}>No organizers registered yet.</p>
+              <p className="empty-org-msg">No organizers registered yet.</p>
             ) : (
-              <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'left'}}>
+              <table className="organizers-list-table">
                 <thead>
-                  <tr style={{borderBottom: '1px solid #1e202c', color: '#ff9f43'}}>
-                    <th style={{padding: '12px'}}>Org Name</th>
-                    <th style={{padding: '12px'}}>Email</th>
-                    <th style={{padding: '12px'}}>Phone</th>
-                    <th style={{padding: '12px'}}>Status</th>
-                    <th style={{padding: '12px'}}>Action</th>
+                  <tr>
+                    <th>Org Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {organizers.map(org => (
-                    <tr key={org.id} style={{borderBottom: '1px solid #1e202c', color: '#e0e6ed'}}>
-                      <td style={{padding: '12px'}}>{org.orgName}</td>
-                      <td style={{padding: '12px'}}>{org.email}</td>
-                      <td style={{padding: '12px'}}>{org.phone}</td>
-                      <td style={{padding: '12px'}}>
-                        <span style={{color: org.approved ? '#2ecc71' : '#f1c40f', fontWeight: 'bold'}}>
+                    <tr key={org.id}>
+                      <td>{org.orgName}</td>
+                      <td>{org.email}</td>
+                      <td>{org.phone}</td>
+                      <td>
+                        <span className={`org-status ${org.approved ? 'approved' : 'pending'}`}>
                           {org.approved ? 'Approved' : 'Pending Verification'}
                         </span>
                       </td>
-                      <td style={{padding: '12px'}}>
+                      <td>
                         {!org.approved ? (
                           <button 
                             onClick={() => handleApproveOrganizer(org.id)}
-                            style={{background: '#ff6a13', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
+                            className="approve-btn"
                           >
                             Approve
                           </button>
                         ) : (
-                          <span style={{color: '#8b90a0'}}>No Action</span>
+                          <span className="no-action">No Action</span>
                         )}
                       </td>
                     </tr>

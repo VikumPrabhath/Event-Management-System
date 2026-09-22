@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Confirmation</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .header {
+            background-color: #1a1b4b;
+            padding: 20px;
+            text-align: center;
+        }
+        .header img {
+            height: 40px;
+        }
+        .content {
+            padding: 30px;
+            color: #333333;
+        }
+        .content h1 {
+            color: #ff6a13;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        .details-box {
+            background-color: #f9fafc;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .details-row {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .details-row strong {
+            color: #1a1b4b;
+            display: inline-block;
+            width: 120px;
+        }
+        .footer {
+            background-color: #f4f6f8;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888888;
+        }
+        .qr-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #eaeaea;
+        }
+        .qr-section p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Logo Header -->
+        <div class="header">
+            <!-- Replace with an actual hosted logo URL if available, or text if not -->
+            <h2 style="color: #fff; margin: 0; letter-spacing: 2px;">SELL<span style="color: #ff6a13;">OUT</span></h2>
+        </div>
+        
+        <!-- Divider -->
+        <div style="height: 6px; background: linear-gradient(90deg, #ff6a13, #e05a0a);"></div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h1>Booking Confirmed!</h1>
+            <p>Hi <span th:text="${customerName}">Customer</span>,</p>
+            <p>You're all set! Your tickets for <strong><span th:text="${eventTitle}">Event Name</span></strong> have been securely booked.</p>
+            
+            <div class="details-box">
+                <div class="details-row">
+                    <strong>Booking ID:</strong> <span th:text="${bookingId}">12345</span>
+                </div>
+                <div class="details-row">
+                    <strong>Date & Time:</strong> <span th:text="${eventDate}">Date</span> at <span th:text="${eventTime}">Time</span>
+                </div>
+                <div class="details-row">
+                    <strong>Venue:</strong> <span th:text="${eventVenue}">Venue</span>
+                </div>
+                <div class="details-row">
+                    <strong>Tickets:</strong> <span th:text="${tickets}">2x VIP</span>
+                </div>
+                <div class="details-row">
+                    <strong>Total Paid:</strong> LKR <span th:text="${totalPaid}">0.00</span>
+                </div>
+            </div>
+
+            <div class="qr-section">
+                <p>Please present the QR code attached to this email at the venue entrance.</p>
+                <strong>See you there!</strong>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 SellOut Event Management. All rights reserved.</p>
+            <p>If you have any questions, reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

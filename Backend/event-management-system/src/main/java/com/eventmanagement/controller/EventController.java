@@ -23,7 +23,17 @@ public class EventController {
 
     @GetMapping("/summary")
     public ResponseEntity<List<EventSummaryDTO>> getEventSummaries() {
-        List<EventSummaryDTO> summaries = eventRepository.findAll().stream().map(e -> {
+        List<EventSummaryDTO> summaries = eventRepository.findAll().stream()
+            .filter(e -> {
+                if (e.getDate() == null || e.getDate().isEmpty()) return true;
+                try {
+                    java.time.LocalDate eventDate = java.time.LocalDate.parse(e.getDate());
+                    return !eventDate.isBefore(java.time.LocalDate.now());
+                } catch (Exception ex) {
+                    return true;
+                }
+            })
+            .map(e -> {
             EventSummaryDTO dto = new EventSummaryDTO();
             dto.setId(e.getId());
             dto.setTitle(e.getTitle());

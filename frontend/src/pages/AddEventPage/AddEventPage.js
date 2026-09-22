@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { X } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import './AddEventPage.css';
@@ -220,13 +221,13 @@ function AddEventPage({ theme, toggleTheme, user }) {
                     onChange={(e) => setTrendingTag(e.target.value)}
                   >
                     <option value="">-- No Tag --</option>
-                    <option value="★ Now Trending 🔥">★ Now Trending 🔥</option>
-                    <option value="⚡ Selling Fast">⚡ Selling Fast</option>
-                    <option value="🎟️ Instant Booking">🎟️ Instant Booking</option>
-                    <option value="🎭 Popular Play">🎭 Popular Play</option>
-                    <option value="🎡 Kids Special">🎡 Kids Special</option>
-                    <option value="💻 Tech Hub">💻 Tech Hub</option>
-                    <option value="🚀 Developer Choice">🚀 Developer Choice</option>
+                    <option value="Now Trending">Now Trending</option>
+                    <option value="Selling Fast">Selling Fast</option>
+                    <option value="Instant Booking">Instant Booking</option>
+                    <option value="Popular Play">Popular Play</option>
+                    <option value="Kids Special">Kids Special</option>
+                    <option value="Tech Hub">Tech Hub</option>
+                    <option value="Developer Choice">Developer Choice</option>
                   </select>
                 </div>
               </div>
@@ -367,8 +368,9 @@ function AddEventPage({ theme, toggleTheme, user }) {
                         type="button" 
                         onClick={() => handleRemoveTier(index)}
                         className="tier-remove-btn"
+                        style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}
                       >
-                        ✕
+                        <X size={16} />
                       </button>
                     </div>
                   </div>

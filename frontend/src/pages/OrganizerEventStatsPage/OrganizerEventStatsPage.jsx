@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { MapPin, Calendar, Ticket, DollarSign, TrendingUp, Users, Download, Edit, X } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import './OrganizerEventStatsPage.css';
@@ -259,8 +260,8 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
                 {cancelLoading ? 'Cancelling...' : 'Cancel Event'}
               </button>
             )}
-            <button className="edit-event-btn" onClick={() => setShowEditForm(!showEditForm)}>
-              {showEditForm ? '✕ Close Edit' : '✎ Edit Event'}
+            <button className="edit-event-btn" onClick={() => setShowEditForm(!showEditForm)} style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+              {showEditForm ? <><X size={16}/> Close Edit</> : <><Edit size={16}/> Edit Event</>}
             </button>
           </div>
         </div>
@@ -278,8 +279,8 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
               <h1 className="event-banner-title">{eventData.title}</h1>
               <div className="event-banner-meta">
                 <span className="event-banner-category">{eventData.category || 'General'}</span>
-                <span className="event-banner-venue">📍 {eventData.venue || 'TBD'}</span>
-                <span className="event-banner-date">📅 {eventData.date ? new Date(eventData.date).toLocaleDateString() : 'TBD'}</span>
+                <span className="event-banner-venue" style={{display: 'flex', alignItems: 'center'}}><MapPin size={14} style={{marginRight: '4px'}}/> {eventData.venue || 'TBD'}</span>
+                <span className="event-banner-date" style={{display: 'flex', alignItems: 'center'}}><Calendar size={14} style={{marginRight: '4px'}}/> {eventData.date ? new Date(eventData.date).toLocaleDateString() : 'TBD'}</span>
               </div>
             </div>
           </div>
@@ -288,7 +289,7 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
         {/* Edit Form */}
         {showEditForm && (
           <div className="edit-event-form-container">
-            <h3 className="edit-form-title">✎ Edit Event</h3>
+            <h3 className="edit-form-title" style={{display: 'flex', alignItems: 'center'}}><Edit size={20} style={{marginRight: '8px'}}/> Edit Event</h3>
             {editError && <div className="edit-error-banner">{editError}</div>}
             <form onSubmit={handleUpdateEvent} className="edit-event-form">
               <div className="edit-form-grid">
@@ -373,13 +374,13 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
                       onChange={(e) => setEditTrendingTag(e.target.value)}
                     >
                       <option value="">-- No Tag --</option>
-                      <option value="★ Now Trending 🔥">★ Now Trending 🔥</option>
-                      <option value="⚡ Selling Fast">⚡ Selling Fast</option>
-                      <option value="🎟️ Instant Booking">🎟️ Instant Booking</option>
-                      <option value="🎭 Popular Play">🎭 Popular Play</option>
-                      <option value="🎡 Kids Special">🎡 Kids Special</option>
-                      <option value="💻 Tech Hub">💻 Tech Hub</option>
-                      <option value="🚀 Developer Choice">🚀 Developer Choice</option>
+                      <option value="Now Trending">Now Trending</option>
+                      <option value="Selling Fast">Selling Fast</option>
+                      <option value="Instant Booking">Instant Booking</option>
+                      <option value="Popular Play">Popular Play</option>
+                      <option value="Kids Special">Kids Special</option>
+                      <option value="Tech Hub">Tech Hub</option>
+                      <option value="Developer Choice">Developer Choice</option>
                     </select>
                   </div>
                   <div className="edit-form-group">
@@ -439,8 +440,9 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
                       type="button" 
                       onClick={() => handleRemoveEditTier(index)}
                       className="remove-tier-btn"
+                      style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}
                     >
-                      ✕
+                      <X size={16} />
                     </button>
                   </div>
                 ))}
@@ -485,21 +487,21 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
         {/* Key Metrics */}
         <div className="organizer-stats-grid">
           <div className="stat-card">
-            <div className="stat-icon calendar-icon">🎟️</div>
+            <div className="stat-icon calendar-icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Ticket size={24} color="#ff6a13" /></div>
             <div className="stat-info">
               <span className="stat-title">Tickets Sold</span>
               <span className="stat-value">{stats.totalTicketsSold} / {stats.totalCapacity}</span>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon money-icon">💵</div>
+            <div className="stat-icon money-icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><DollarSign size={24} color="#2ecc71" /></div>
             <div className="stat-info">
               <span className="stat-title">Total Revenue</span>
               <span className="stat-value">{stats.totalRevenue}</span>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon ticket-icon">📍</div>
+            <div className="stat-icon ticket-icon" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}><MapPin size={24} color="#3498db" /></div>
             <div className="stat-info">
               <span className="stat-title">Venue</span>
               <span className="stat-value venue-value">{eventData.venue}</span>
@@ -510,7 +512,7 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
         <div className="dashboard-middle-row">
           {/* Ticket Breakdown Pie Chart */}
           <div className="organizer-section chart-section">
-            <h3 className="section-title">🎟️ Ticket Tier Breakdown</h3>
+            <h3 className="section-title" style={{display:'flex', alignItems:'center'}}><Ticket size={20} style={{marginRight: '8px', color: '#ff6a13'}}/> Ticket Tier Breakdown</h3>
             <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -548,7 +550,7 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
 
           {/* Sales Trend Bar Chart */}
           <div className="organizer-section chart-section">
-            <h3 className="section-title">📈 Sales Velocity</h3>
+            <h3 className="section-title" style={{display:'flex', alignItems:'center'}}><TrendingUp size={20} style={{marginRight: '8px', color: '#2ecc71'}}/> Sales Velocity</h3>
             <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.chartData}>
@@ -571,9 +573,9 @@ function OrganizerEventStatsPage({ theme, toggleTheme, user: propUser }) {
         {/* Attendees List Section */}
         <div className="organizer-section attendees-section">
           <div className="attendees-header">
-            <h3 className="section-title">👥 Attendees & Bookings</h3>
-            <button className="export-csv-btn" onClick={downloadCSV}>
-              📥 Export CSV
+            <h3 className="section-title" style={{display:'flex', alignItems:'center', margin: 0}}><Users size={20} style={{marginRight: '8px', color: '#3498db'}}/> Attendees & Bookings</h3>
+            <button className="export-csv-btn" onClick={downloadCSV} style={{display:'flex', alignItems:'center'}}>
+              <Download size={16} style={{marginRight: '6px'}}/> Export CSV
             </button>
           </div>
           
