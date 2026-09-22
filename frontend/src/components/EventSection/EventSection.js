@@ -26,7 +26,7 @@ function EventSection({ events = [], onSelectEvent }) {
       time: e.timeFrom || '',
       title: e.title,
       category: e.category === 'music' ? 'Concert & Music' : e.category === 'sports' ? 'Sport & Adventure' : e.category === 'drama' ? 'Art & Drama' : e.category === 'tech-meetup' ? 'Tech Meetup' : e.category === 'dev-meetup' ? 'Developer Meetup' : 'Family & Others',
-      price: e.ticketTiers && e.ticketTiers.length > 0 ? `LKR ${e.ticketTiers[0].price.toLocaleString()}` : 'LKR 0.00',
+      price: e.minPrice && e.minPrice > 0 ? `LKR ${Number(e.minPrice).toLocaleString('en-US')}` : 'Free',
       countdown: 'Upcoming',
       trendingTag: e.trendingTag || '',
       image: e.imageUrl

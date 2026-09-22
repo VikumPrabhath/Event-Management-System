@@ -2,6 +2,7 @@ package com.eventmanagement.controller;
 
 import com.eventmanagement.service.EventService;
 import com.eventmanagement.entity.Event;
+import com.eventmanagement.entity.TicketTier;
 import com.eventmanagement.dto.EventSummaryDTO;
 import com.eventmanagement.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +44,22 @@ public class EventController {
             dto.setVenue(e.getVenue());
             dto.setImageUrl(e.getImageUrl());
             dto.setTrendingTag(e.getTrendingTag());
-            dto.setMinPrice(e.getTicketTiers() == null || e.getTicketTiers().isEmpty() ? 0 : e.getTicketTiers().get(0).getPrice());
+
+            double minPrice = 0.0;
+            if (e.getTicketTiers() != null && !e.getTicketTiers().isEmpty()) {
+                minPrice = e.getTicketTiers().stream()
+                        .mapToDouble(TicketTier::getPrice)
+                        .min()
+                        .orElse(0.0);
+            } else if (e.getPrice() != null) {
+                minPrice = e.getPrice();
+            }
+            dto.setMinPrice(minPrice);
+
             dto.setEarlyBirdDiscount(e.getEarlyBirdDiscount());
             dto.setEarlyBirdLimit(e.getEarlyBirdLimit());
             dto.setTicketsSold(e.getTicketsSold());
-            int totalCap = e.getTicketTiers() == null ? 0 : e.getTicketTiers().stream().mapToInt(com.eventmanagement.entity.TicketTier::getCapacity).sum();
+            int totalCap = e.getTicketTiers() == null ? 0 : e.getTicketTiers().stream().mapToInt(TicketTier::getCapacity).sum();
             dto.setTotalCapacity(totalCap);
             dto.setStatus(e.getStatus() == null ? "ACTIVE" : e.getStatus());
             return dto;
