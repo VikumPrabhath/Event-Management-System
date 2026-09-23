@@ -3,6 +3,7 @@
   background-color: #ffffff;
   font-family: 'Inter', -apple-system, sans-serif;
   transition: background-color 0.3s ease;
+  scroll-margin-top: 20px;
 }
 
 body.dark-theme .promo-banners-section {

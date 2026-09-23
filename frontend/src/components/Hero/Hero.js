@@ -69,9 +69,9 @@ function Hero({ events = [], onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
             <a href="#events-grid-section" className="cta-primary">
               Explore All Events
             </a>
-            <button className="cta-secondary" onClick={() => onSelectEvent && onSelectEvent(activeCard)}>
+            <a href="#featured-spotlights-section" className="cta-secondary">
               View Featured
-            </button>
+            </a>
             <button className="cta-organizer" onClick={onOpenOrganizerAuth || onOpenAuth}>
               Publish or Organize Event
             </button>
