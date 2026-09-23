@@ -55,7 +55,20 @@ function Footer() {
         <div className="footer-col sitemap-col">
           <h3 className="footer-title">Site map</h3>
           <ul className="footer-links">
-            <li><a href="#concerts">Concerts</a></li>
+            <li>
+              <a 
+                href="#concerts" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.hash = '#concerts';
+                  const el = document.getElementById('concerts') || document.getElementById('events-grid-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  window.dispatchEvent(new CustomEvent('select-event-tab', { detail: 'Concerts' }));
+                }}
+              >
+                Concerts
+              </a>
+            </li>
             <li><a href="#tickets">Tickets</a></li>
             <li><a href="#login">Login</a></li>
             <li><a href="#booking">Booking</a></li>

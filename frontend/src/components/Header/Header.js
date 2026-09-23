@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, ChevronDown, ChevronUp, User, Sun, Moon } from 'lucide-react';
 import EventsMegaMenu from '../EventsMegaMenu/EventsMegaMenu';
 import './Header.css';
 
 function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [imgError, setImgError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showMegaMenu, setShowMegaMenu] = useState(false);
@@ -16,6 +18,20 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (onSearch) onSearch(searchTerm);
+  };
+
+  const handleCategoryNav = (hash, tabName) => (e) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      window.location.hash = hash;
+      const el = document.getElementById(hash.substring(1)) || document.getElementById('events-grid-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+      window.dispatchEvent(new CustomEvent('select-event-tab', { detail: tabName }));
+    } else {
+      navigate(`/${hash}`);
+    }
   };
 
   return (
@@ -62,8 +78,8 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
             >
               Events {showMegaMenu ? <ChevronUp size={14} style={{marginLeft: '4px'}} /> : <ChevronDown size={14} style={{marginLeft: '4px'}} />}
             </button>
-            <a href="#concerts" className="nav-link">Concerts</a>
-            <a href="#theater" className="nav-link">Theater</a>
+            <a href="#concerts" onClick={handleCategoryNav('#concerts', 'Concerts')} className="nav-link">Concerts</a>
+            <a href="#theater" onClick={handleCategoryNav('#theater', 'Art & Drama')} className="nav-link">Theater</a>
             {user ? (
               <Link to={user.role === 'Organizer' ? "/organizer/dashboard" : "/dashboard"} className="nav-link user-dash-link">
                 My Dashboard

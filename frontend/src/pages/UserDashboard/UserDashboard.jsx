@@ -183,10 +183,10 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
             <div className="nav-dropdown" onClick={() => setShowMegaMenu(!showMegaMenu)} style={{cursor: 'pointer', display: 'flex', alignItems: 'center'}}>
               <span>Events {showMegaMenu ? <ChevronUp size={14} style={{marginLeft: '4px'}} /> : <ChevronDown size={14} style={{marginLeft: '4px'}} />}</span>
             </div>
-            <Link to="/" className="nav-item">Concerts</Link>
-            <Link to="/" className="nav-item">Art & Drama</Link>
-            <Link to="/" className="nav-item">Sport & Adventure</Link>
-            <Link to="/" className="nav-item">Family & Others</Link>
+            <Link to="/#concerts" className="nav-item">Concerts</Link>
+            <Link to="/#theater" className="nav-item">Art & Drama</Link>
+            <Link to="/#sports" className="nav-item">Sport & Adventure</Link>
+            <Link to="/#family" className="nav-item">Family & Others</Link>
           </nav>
         </div>
         <div className="nav-right">

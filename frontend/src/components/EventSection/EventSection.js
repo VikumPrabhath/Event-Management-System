@@ -4,10 +4,49 @@ import SportsCard from '../SportsCard/SportsCard';
 import MeetupCard from '../MeetupCard/MeetupCard';
 import './EventSection.css';
 
+const CATEGORY_TAB_MAPPING = {
+  '#concerts': 'Concerts',
+  '#theater': 'Art & Drama',
+  '#drama': 'Art & Drama',
+  '#sports': 'Sports & Adventure',
+  '#family': 'Family',
+  '#tech': 'Tech & Dev'
+};
+
 function EventSection({ events = [], onSelectEvent }) {
   const [activeTab, setActiveTab] = useState('Concerts');
 
   const tabs = ['Concerts', 'Sports & Adventure', 'Art & Drama', 'Family', 'Tech & Dev'];
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash && CATEGORY_TAB_MAPPING[hash]) {
+        setActiveTab(CATEGORY_TAB_MAPPING[hash]);
+        setTimeout(() => {
+          const el = document.getElementById('concerts') || document.getElementById('events-grid-section');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 80);
+      }
+    };
+
+    const handleCustomTabSelect = (e) => {
+      if (e.detail) {
+        setActiveTab(e.detail);
+      }
+    };
+
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    window.addEventListener('select-event-tab', handleCustomTabSelect);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHash);
+      window.removeEventListener('select-event-tab', handleCustomTabSelect);
+    };
+  }, []);
 
   const getCategorizedEvents = (cat) => {
     const mapping = {
@@ -38,7 +77,8 @@ function EventSection({ events = [], onSelectEvent }) {
   const currentTabEvents = getCategorizedEvents(activeTab);
 
   return (
-    <section id="events-grid-section" className="event-section">
+    <section id="concerts" className="event-section">
+      <div id="events-grid-section"></div>
       <div className="section-container">
         <h2 className="section-title">
           <span className="title-highlight">Explore</span> Upcoming Events

@@ -3,6 +3,7 @@
   background-color: #fafafa;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: background-color 0.3s ease;
+  scroll-margin-top: 20px;
 }
 
 body.dark-theme .event-section {

@@ -9,7 +9,8 @@ function TypeBannersSection({ onSelectEvent }) {
       title: 'Drama & Live Theatre',
       desc: 'Experience the magic of live performances and storytelling.',
       bgClass: 'bg-theater',
-      icon: '🎭'
+      icon: '🎭',
+      tab: 'Art & Drama'
     },
     {
       id: 'meetups',
@@ -17,7 +18,8 @@ function TypeBannersSection({ onSelectEvent }) {
       title: 'Developer Meetups',
       desc: 'Connect with tech enthusiasts and join exclusive workshops.',
       bgClass: 'bg-meetups',
-      icon: '💻'
+      icon: '💻',
+      tab: 'Tech & Dev'
     },
     {
       id: 'festivals',
@@ -25,9 +27,18 @@ function TypeBannersSection({ onSelectEvent }) {
       title: 'Mega Music Festivals',
       desc: 'Dance the night away with top global artists.',
       bgClass: 'bg-festivals',
-      icon: '🎪'
+      icon: '🎪',
+      tab: 'Concerts'
     }
   ];
+
+  const handleExplore = (tab) => {
+    const el = document.getElementById('concerts') || document.getElementById('events-grid-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+    window.dispatchEvent(new CustomEvent('select-event-tab', { detail: tab }));
+  };
 
   return (
     <section className="type-banners-section">
@@ -38,7 +49,7 @@ function TypeBannersSection({ onSelectEvent }) {
               <span className="type-badge">{banner.type}</span>
               <h3>{banner.title}</h3>
               <p>{banner.desc}</p>
-              <button className="type-btn">Explore {banner.icon}</button>
+              <button className="type-btn" onClick={() => handleExplore(banner.tab)}>Explore {banner.icon}</button>
             </div>
             <div className="type-icon-bg">{banner.icon}</div>
           </div>
