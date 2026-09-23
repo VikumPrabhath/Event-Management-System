@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import EventCard from '../EventCard/EventCard';
 import SportsCard from '../SportsCard/SportsCard';
 import MeetupCard from '../MeetupCard/MeetupCard';
@@ -9,15 +9,15 @@ function EventSection({ events = [], onSelectEvent }) {
 
   const tabs = ['Concerts', 'Sports & Adventure', 'Art & Drama', 'Family', 'Tech & Dev'];
 
+  const mapping = {
+    'Concerts': ['music'],
+    'Sports & Adventure': ['sports'],
+    'Art & Drama': ['drama'],
+    'Family': ['family'],
+    'Tech & Dev': ['tech-meetup', 'dev-meetup']
+  };
+
   const getCategorizedEvents = (cat) => {
-    const mapping = {
-      'Concerts': ['music'],
-      'Sports & Adventure': ['sports'],
-      'Art & Drama': ['drama'],
-      'Family': ['family'],
-      'Tech & Dev': ['tech-meetup', 'dev-meetup']
-    };
-    
     const dbCats = mapping[cat] || [];
     const dbEvents = events.filter(e => dbCats.includes(e.category)).map(e => ({
       ...e,

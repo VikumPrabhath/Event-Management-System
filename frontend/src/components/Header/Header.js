@@ -1,25 +1,151 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ChevronDown, ChevronUp, User, Sun, Moon } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, X, ChevronDown, ChevronUp, User, Sun, Moon } from 'lucide-react';
 import EventsMegaMenu from '../EventsMegaMenu/EventsMegaMenu';
 import './Header.css';
 
-function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
+function Header({ events: propEvents = [], onSelectEvent, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
+  const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
   const [showMegaMenu, setShowMegaMenu] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  // Self-sufficient event storage for global search
+  const [internalEvents, setInternalEvents] = useState(() => {
+    if (propEvents && propEvents.length > 0) return propEvents;
+    try {
+      const cached = sessionStorage.getItem('landing_events_cache');
+      return cached ? JSON.parse(cached) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  // Sync or fetch events if not provided via props and not in cache
+  useEffect(() => {
+    // If parent supplied events (e.g. LandingPage), use them directly
+    if (propEvents && propEvents.length > 0) {
+      setInternalEvents(propEvents);
+      return;
+    }
+
+    // Do not fetch on admin views where search is hidden
+    if (isAdminView) return;
+
+    // Check sessionStorage cache first
+    try {
+      const cached = sessionStorage.getItem('landing_events_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setInternalEvents(parsed);
+          return;
+        }
+      }
+    } catch (e) {
+      // ignore parse errors and proceed to fetch
+    }
+
+    // Fallback: fetch once if cache is empty (e.g. direct visit to /event/:id)
+    fetch('http://localhost:8081/api/events/summary')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const valid = data.filter(e => {
+            if (!e.date) return true;
+            return new Date(e.date) >= today;
+          });
+          setInternalEvents(valid);
+          sessionStorage.setItem('landing_events_cache', JSON.stringify(valid));
+        }
+      })
+      .catch(err => console.error('Failed to load global search events:', err));
+  }, [propEvents, isAdminView]);
+
+  // Close dropdown on click outside or on Escape key
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, []);
 
   const handleLogoError = () => {
     setImgError(true);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (onSearch) onSearch(searchTerm);
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+    if (val.trim()) {
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
   };
 
+  const handleSearchFocus = () => {
+    if (searchTerm.trim()) {
+      setIsOpen(true);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setIsOpen(false);
+  };
+
+  const handleSelectEvent = (eventItem) => {
+    setIsOpen(false);
+    setSearchTerm('');
+    if (onSelectEvent) {
+      onSelectEvent(eventItem);
+    } else {
+      navigate(`/event/${eventItem.id}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (matchingEvents.length > 0) {
+      handleSelectEvent(matchingEvents[0]);
+    }
+  };
+
+  // Dynamic partial-matching across title, venue, and category
+  const searchableEvents = (propEvents && propEvents.length > 0) ? propEvents : internalEvents;
+  const trimmed = searchTerm.trim().toLowerCase();
+  const matchingEvents = trimmed && searchableEvents.length > 0
+    ? searchableEvents.filter(e => {
+        const titleMatch = (e.title || '').toLowerCase().includes(trimmed);
+        const venueMatch = (e.venue || '').toLowerCase().includes(trimmed);
+        const categoryMatch = (e.category || '').toLowerCase().includes(trimmed);
+        const isMusic = e.category === 'music' && (trimmed.includes('concert') || 'concert'.includes(trimmed) || trimmed.includes('music'));
+        const isDrama = e.category === 'drama' && (trimmed.includes('theater') || trimmed.includes('theatre') || trimmed.includes('drama') || trimmed.includes('art'));
+        return titleMatch || venueMatch || categoryMatch || isMusic || isDrama;
+      })
+    : [];
+
   return (
-    <header className={`header ${theme === 'dark' ? 'dark-header' : ''}`} style={{position: 'relative'}}>
+    <header className={`header ${theme === 'dark' ? 'dark-header' : ''}`} style={{position: 'relative', zIndex: 1000}}>
       <div className="logo-container">
         <Link to="/" style={{ textDecoration: 'none' }}>
           {imgError ? (
@@ -42,17 +168,83 @@ function Header({ onSearch, theme, toggleTheme, isAdminView, user, onOpenAuth })
 
       {!isAdminView ? (
         <>
-          {/* Integrated Search Bar in Header */}
-          <form onSubmit={handleSearchSubmit} className="header-search-form">
-            <span className="header-search-icon"><Search size={16} /></span>
-            <input 
-              type="text" 
-              placeholder="Search concerts, theater..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="header-search-input"
-            />
-          </form>
+          {/* Integrated Search Bar with Floating Autocomplete Dropdown */}
+          <div className="header-search-container" ref={searchContainerRef}>
+            <form onSubmit={handleSearchSubmit} className="header-search-form">
+              <span className="header-search-icon"><Search size={16} /></span>
+              <input 
+                type="text" 
+                placeholder="Search concerts, theater..." 
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
+                className="header-search-input"
+              />
+              {searchTerm && (
+                <button 
+                  type="button" 
+                  className="header-search-clear" 
+                  onClick={handleClearSearch}
+                  aria-label="Clear search"
+                  title="Clear search"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </form>
+
+            {/* Floating Dropdown Results Panel */}
+            {isOpen && trimmed.length > 0 && (
+              <div className="search-results-dropdown">
+                {matchingEvents.length > 0 ? (
+                  <div className="search-results-list">
+                    {matchingEvents.map((item) => {
+                      const formattedDate = item.date 
+                        ? new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) 
+                        : '';
+                      const metaInfo = [item.venue, formattedDate].filter(Boolean).join(' • ');
+                      const priceText = item.minPrice && item.minPrice > 0 
+                        ? `From LKR ${Number(item.minPrice).toLocaleString('en-US')}` 
+                        : 'Free';
+
+                      return (
+                        <div 
+                          key={item.id} 
+                          className="search-result-item"
+                          onClick={() => handleSelectEvent(item)}
+                        >
+                          <div className="search-result-thumb-wrapper">
+                            <img 
+                              src={item.imageUrl || '/assets/default-event.jpg'} 
+                              alt={item.title} 
+                              className="search-result-thumb"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = '/assets/default-event.jpg';
+                              }}
+                            />
+                          </div>
+                          <div className="search-result-info">
+                            <h4 className="search-result-title">{item.title}</h4>
+                            <span className="search-result-meta">{metaInfo}</span>
+                          </div>
+                          <div className="search-result-price">
+                            {priceText}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="search-no-results">
+                    <span className="no-results-icon">🔍</span>
+                    <p className="no-results-title">No events found</p>
+                    <p className="no-results-desc">No events match "{searchTerm}"</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
           
           <nav className="nav-menu">
             <button 
