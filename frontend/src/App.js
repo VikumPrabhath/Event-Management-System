@@ -119,11 +119,15 @@ function AppContent() {
         <Route 
           path="/dashboard" 
           element={
-            <UserDashboard 
-              user={user} 
-              onLogout={handleLogout} 
-              onUpdateUser={handleUpdateUser} 
-            />
+            user ? (
+              <UserDashboard 
+                user={user} 
+                onLogout={handleLogout} 
+                onUpdateUser={handleUpdateUser} 
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
           } 
         />
 
