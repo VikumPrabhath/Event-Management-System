@@ -13,4 +13,9 @@ frontend/.env
 # OS files
 .DS_Store
 Thumbs.db
- 
+
+# Local configuration files
+local.properties
+application.properties
+application-local.properties
+*.local.properties

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import EventCard from '../EventCard/EventCard';
 import SportsCard from '../SportsCard/SportsCard';
 import MeetupCard from '../MeetupCard/MeetupCard';
@@ -18,45 +18,15 @@ function EventSection({ events = [], onSelectEvent }) {
 
   const tabs = ['Concerts', 'Sports & Adventure', 'Art & Drama', 'Family', 'Tech & Dev'];
 
-  useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash;
-      if (hash && CATEGORY_TAB_MAPPING[hash]) {
-        setActiveTab(CATEGORY_TAB_MAPPING[hash]);
-        setTimeout(() => {
-          const el = document.getElementById('concerts') || document.getElementById('events-grid-section');
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 80);
-      }
-    };
-
-    const handleCustomTabSelect = (e) => {
-      if (e.detail) {
-        setActiveTab(e.detail);
-      }
-    };
-
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    window.addEventListener('select-event-tab', handleCustomTabSelect);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHash);
-      window.removeEventListener('select-event-tab', handleCustomTabSelect);
-    };
-  }, []);
+  const mapping = {
+    'Concerts': ['music'],
+    'Sports & Adventure': ['sports'],
+    'Art & Drama': ['drama'],
+    'Family': ['family'],
+    'Tech & Dev': ['tech-meetup', 'dev-meetup']
+  };
 
   const getCategorizedEvents = (cat) => {
-    const mapping = {
-      'Concerts': ['music'],
-      'Sports & Adventure': ['sports'],
-      'Art & Drama': ['drama'],
-      'Family': ['family'],
-      'Tech & Dev': ['tech-meetup', 'dev-meetup']
-    };
-    
     const dbCats = mapping[cat] || [];
     const dbEvents = events.filter(e => dbCats.includes(e.category)).map(e => ({
       ...e,
@@ -65,7 +35,7 @@ function EventSection({ events = [], onSelectEvent }) {
       time: e.timeFrom || '',
       title: e.title,
       category: e.category === 'music' ? 'Concert & Music' : e.category === 'sports' ? 'Sport & Adventure' : e.category === 'drama' ? 'Art & Drama' : e.category === 'tech-meetup' ? 'Tech Meetup' : e.category === 'dev-meetup' ? 'Developer Meetup' : 'Family & Others',
-      price: e.ticketTiers && e.ticketTiers.length > 0 ? `LKR ${e.ticketTiers[0].price.toLocaleString()}` : 'LKR 0.00',
+      price: e.minPrice && e.minPrice > 0 ? `LKR ${Number(e.minPrice).toLocaleString('en-US')}` : 'Free',
       countdown: 'Upcoming',
       trendingTag: e.trendingTag || '',
       image: e.imageUrl

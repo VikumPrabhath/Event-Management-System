@@ -52,7 +52,14 @@ function LandingPage({ onSelectEvent, theme, toggleTheme, user, onOpenAuth, onOp
 
   return (
     <div className={`landing-page ${theme}-mode`}>
-      <Header theme={theme} toggleTheme={toggleTheme} user={user} onOpenAuth={onOpenAuth} />
+      <Header 
+        events={events}
+        onSelectEvent={onSelectEvent}
+        theme={theme} 
+        toggleTheme={toggleTheme} 
+        user={user} 
+        onOpenAuth={onOpenAuth} 
+      />
       {isLoading ? (
         <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: theme === 'dark' ? '#0d0e15' : '#f4f6f8' }}>
           <div className="spinner" style={{ borderColor: 'rgba(255, 106, 19, 0.3)', borderTopColor: '#ff6a13', animation: 'spin 1s linear infinite' }}></div>

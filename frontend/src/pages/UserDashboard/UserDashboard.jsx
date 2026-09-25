@@ -12,14 +12,14 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
   const [showMegaMenu, setShowMegaMenu] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const currentUser = user || {
-    id: 'anonymous',
-    name: 'Quick Take',
-    email: 'quicktake611@gmail.com',
-    phone: '+1 234 567 890',
-    authProvider: 'Google',
-    joinedDate: 'Jun 2026',
-    eventsAttended: 0
+  const currentUser = {
+    id: user?.id || 'anonymous',
+    name: user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User',
+    email: user?.email || '',
+    phone: user?.mobileNo || user?.phone || '',
+    authProvider: user?.authProvider || 'Email',
+    joinedDate: user?.joinedDate || 'Jun 2026',
+    eventsAttended: user?.eventsAttended || 0
   };
 
   // Edit Profile Form state
@@ -33,21 +33,30 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
   const [loadingBookings, setLoadingBookings] = useState(false);
 
   useEffect(() => {
+    if (!user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
     // Sync inputs if user changes
-    setName(currentUser.name);
-    setEmail(currentUser.email);
-    setPhone(currentUser.phone);
+    if (user) {
+      setName(user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || '');
+      setEmail(user.email || '');
+      setPhone(user.mobileNo || user.phone || '');
+    }
   }, [user]);
 
   useEffect(() => {
-    if (currentUser?.email) {
+    if (user?.email) {
       fetchBookings();
     }
-  }, [currentUser?.email]);
+  }, [user?.email]);
 
   const fetchBookings = () => {
+    if (!user?.email) return;
     setLoadingBookings(true);
-    fetch(`http://localhost:8081/api/bookings/history/email/${currentUser.email}`)
+    fetch(`http://localhost:8081/api/bookings/history/email/${user.email}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to load bookings');
         return res.json();
@@ -63,11 +72,11 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
       });
   };
 
-  const handleLogout =async () => {
+  const handleLogout = async () => {
     try {
-          await fetch('http://localhost:8081/api/auth/logout', {
-          method: 'POST',
-          credentials: 'include', // Send session cookie
+      await fetch('http://localhost:8081/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Send session cookie
       });
     } catch (err) {
       console.error('Logout request failed:', err);
@@ -75,7 +84,7 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
       if (onLogout) {
         onLogout();
       }
-      navigate('/');
+      navigate('/', { replace: true });
     }
   };
 
@@ -158,6 +167,10 @@ function UserDashboard({ user, onLogout, onUpdateUser }) {
       alert("Error: " + err.message);
     }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="dashboard-container">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-import EventCard from '../../components/EventCard/EventCard';
+// EventCard removed for tabular layout
 import './OrganizerDashboard.css';
 
 function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
@@ -27,11 +27,20 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
     }
   }, [user?.id]);
 
-  const handleLogoutClick = () => {
-    if (onLogout) {
-      onLogout();
+  const handleLogoutClick = async () => {
+    try {
+      await fetch('http://localhost:8081/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout request failed:', err);
+    } finally {
+      if (onLogout) {
+        onLogout();
+      }
+      navigate('/', { replace: true });
     }
-    navigate('/');
   };
 
   // Split into upcoming and past based on current date
@@ -68,6 +77,13 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
           </h2>
         </div>
         <div className="dashboard-header-right">
+          <button 
+            className="logout-header-btn"
+            style={{ borderColor: 'rgba(255,106,19,0.3)', color: '#ff6a13' }}
+            onClick={() => navigate('/organizer/profile', { state: { user } })}
+          >
+            My Profile
+          </button>
           <button 
             className="create-event-btn"
             onClick={() => navigate('/organizer/add-event')}
@@ -119,19 +135,29 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
           ) : upcomingEvents.length === 0 ? (
             <p className="empty-text">No upcoming events scheduled. Create one to get started!</p>
           ) : (
-            <div className="organizer-events-grid">
-              {upcomingEvents.map(event => (
-                <EventCard 
-                  key={event.id} 
-                  event={{
-                    ...event, 
-                    price: event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free',
-                    imageUrl: event.imageUrl || '/assets/default-event.jpg'
-                  }} 
-                  onClick={() => handleEventClick(event.id)} 
-                  compactMode={true} 
-                />
-              ))}
+            <div className="table-container">
+              <table className="enterprise-table">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {upcomingEvents.map(event => (
+                    <tr key={event.id}>
+                      <td>{event.title}</td>
+                      <td>{event.date ? new Date(event.date).toLocaleDateString() : 'TBA'} at {event.timeFrom}</td>
+                      <td>{event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free'}</td>
+                      <td>
+                        <button className="text-action-btn" onClick={() => handleEventClick(event.id)}>View Stats &rarr;</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
@@ -144,19 +170,29 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
           ) : pastEvents.length === 0 ? (
             <p className="empty-text">No past events found.</p>
           ) : (
-            <div className="organizer-events-grid">
-              {pastEvents.map(event => (
-                <EventCard 
-                  key={event.id} 
-                  event={{
-                    ...event, 
-                    price: event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free',
-                    imageUrl: event.imageUrl || '/assets/default-event.jpg'
-                  }} 
-                  onClick={() => handleEventClick(event.id)} 
-                  compactMode={true} 
-                />
-              ))}
+            <div className="table-container">
+              <table className="enterprise-table">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pastEvents.map(event => (
+                    <tr key={event.id}>
+                      <td>{event.title}</td>
+                      <td>{event.date ? new Date(event.date).toLocaleDateString() : 'TBA'} at {event.timeFrom}</td>
+                      <td>{event.ticketTiers && event.ticketTiers.length > 0 ? `LKR ${event.ticketTiers[0].price}` : 'Free'}</td>
+                      <td>
+                        <button className="text-action-btn" onClick={() => handleEventClick(event.id)}>View Stats &rarr;</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

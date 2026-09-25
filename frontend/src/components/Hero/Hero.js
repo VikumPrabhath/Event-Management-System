@@ -20,7 +20,7 @@ function Hero({ events = [], onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
     title: e.title,
     date: e.date ? new Date(e.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase() : 'UPCOMING',
     doors: `Doors ${e.timeFrom || '7:00 PM'}`,
-    price: e.ticketTiers && e.ticketTiers.length > 0 ? `LKR ${e.ticketTiers[0].price.toLocaleString()}` : 'Free',
+    price: e.minPrice && e.minPrice > 0 ? `LKR ${Number(e.minPrice).toLocaleString('en-US')}` : 'Free',
     countdown: getCountdown(e.date),
     bgGradient: 'linear-gradient(135deg, #1f1c2c, #4a4c84)',
     icon: '🎤',
@@ -69,9 +69,9 @@ function Hero({ events = [], onSelectEvent, onOpenAuth, onOpenOrganizerAuth }) {
             <a href="#events-grid-section" className="cta-primary">
               Explore All Events
             </a>
-            <button className="cta-secondary" onClick={() => onSelectEvent && onSelectEvent(activeCard)}>
+            <a href="#featured-spotlights-section" className="cta-secondary">
               View Featured
-            </button>
+            </a>
             <button className="cta-organizer" onClick={onOpenOrganizerAuth || onOpenAuth}>
               Publish or Organize Event
             </button>

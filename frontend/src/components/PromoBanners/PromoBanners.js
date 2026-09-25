@@ -9,7 +9,7 @@ function PromoBanners({ events = [], onSelectEvent }) {
   const thirdEvent = events.length > 2 ? events[2] : null;
 
   return (
-    <section className="promo-banners-section">
+    <section id="featured-spotlights-section" className="promo-banners-section">
       <div className="promo-container">
         <h2 className="promo-section-title">
           <span className="fire-icon">🔥</span> FEATURED SPOTLIGHTS & DEALS
