@@ -6,12 +6,13 @@ import 'react-calendar/dist/Calendar.css';
 import './AdminDashboard.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-import EventCard from '../../components/EventCard/EventCard';
+// EventCard removed for tabular layout
 
 function AdminDashboard({ theme, toggleTheme }) {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
   const [organizers, setOrganizers] = useState([]);
+  const [selectedOrganizer, setSelectedOrganizer] = useState(null);
 
   const [events, setEvents] = useState([]);
 
@@ -202,10 +203,27 @@ function AdminDashboard({ theme, toggleTheme }) {
               <button className="clear-date-btn" onClick={() => setSelectedDate(null)}>Close</button>
             </div>
             {selectedDateEvents.length > 0 ? (
-              <div className="admin-events-grid">
-                {selectedDateEvents.map(event => (
-                  <EventCard key={event.id} event={{...event, date: event.date.toLocaleDateString()}} onClick={() => navigate(`/admin/event/${event.id}/stats`)} compactMode={true} />
-                ))}
+              <div className="table-container">
+                <table className="enterprise-table">
+                  <thead>
+                    <tr>
+                      <th>Event Name</th>
+                      <th>Time</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedDateEvents.map(event => (
+                      <tr key={event.id}>
+                        <td>{event.title}</td>
+                        <td>{event.time}</td>
+                        <td>
+                          <button className="text-action-btn" onClick={() => navigate(`/admin/event/${event.id}/stats`)}>View Stats &rarr;</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ) : (
               <div className="no-events-message">
@@ -251,16 +269,22 @@ function AdminDashboard({ theme, toggleTheme }) {
                         </span>
                       </td>
                       <td>
-                        {!org.approved ? (
+                        <div style={{ display: 'flex', gap: '10px' }}>
                           <button 
-                            onClick={() => handleApproveOrganizer(org.id)}
-                            className="approve-btn"
+                            onClick={() => setSelectedOrganizer(org)}
+                            className="view-org-btn"
                           >
-                            Approve
+                            View Profile
                           </button>
-                        ) : (
-                          <span className="no-action">No Action</span>
-                        )}
+                          {!org.approved && (
+                            <button 
+                              onClick={() => handleApproveOrganizer(org.id)}
+                              className="approve-btn"
+                            >
+                              Approve
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -274,10 +298,35 @@ function AdminDashboard({ theme, toggleTheme }) {
         <div className="admin-section recent-events-section" style={{marginTop: '40px'}}>
           <h3>Upcoming Events</h3>
           <p className="section-hint">Click an event to view detailed ticket sales & analytics.</p>
-          <div className="admin-events-grid">
-            {upcomingEvents.map(event => (
-              <EventCard key={event.id} event={{...event, date: event.date.toLocaleDateString()}} onClick={() => navigate(`/admin/event/${event.id}/stats`)} compactMode={true} />
-            ))}
+          <div className="table-container">
+            {upcomingEvents.length === 0 ? (
+              <p className="empty-text">No upcoming events.</p>
+            ) : (
+              <table className="enterprise-table">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {upcomingEvents.map(event => (
+                    <tr key={event.id}>
+                      <td>{event.title}</td>
+                      <td>{event.date.toLocaleDateString()} at {event.time}</td>
+                      <td>{event.location}</td>
+                      <td>{event.type}</td>
+                      <td>
+                        <button className="text-action-btn" onClick={() => navigate(`/admin/event/${event.id}/stats`)}>View Stats &rarr;</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
@@ -285,13 +334,91 @@ function AdminDashboard({ theme, toggleTheme }) {
         <div className="admin-section history-events-section" style={{marginTop: '40px'}}>
           <h3>Event History & Sold Out</h3>
           <p className="section-hint">View finalized stats for finished or sold out events.</p>
-          <div className="admin-events-grid">
-            {historyEvents.map(event => (
-              <EventCard key={event.id} event={{...event, date: event.date.toLocaleDateString()}} onClick={() => navigate(`/admin/event/${event.id}/stats`)} compactMode={true} />
-            ))}
+          <div className="table-container">
+            {historyEvents.length === 0 ? (
+              <p className="empty-text">No history events.</p>
+            ) : (
+              <table className="enterprise-table">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyEvents.map(event => (
+                    <tr key={event.id}>
+                      <td>{event.title}</td>
+                      <td>{event.date.toLocaleDateString()} at {event.time}</td>
+                      <td>{event.location}</td>
+                      <td>{event.type}</td>
+                      <td>
+                        <button className="text-action-btn" onClick={() => navigate(`/admin/event/${event.id}/stats`)}>View Stats &rarr;</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </main>
+
+      {/* Organizer Profile Modal */}
+      {selectedOrganizer && (
+        <div className="org-modal-overlay" onClick={() => setSelectedOrganizer(null)}>
+          <div className="org-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal-btn" onClick={() => setSelectedOrganizer(null)}>&times;</button>
+            <div className="org-modal-header">
+              <div 
+                className="org-modal-logo" 
+                style={{ backgroundImage: `url(${selectedOrganizer.profileImageUrl || 'https://via.placeholder.com/150?text=No+Logo'})`}}
+              ></div>
+              <div className="org-modal-title">
+                <h3>{selectedOrganizer.orgName}</h3>
+                <span className={`org-status ${selectedOrganizer.approved ? 'approved' : 'pending'}`}>
+                  {selectedOrganizer.approved ? 'Approved' : 'Pending Verification'}
+                </span>
+              </div>
+            </div>
+            <div className="org-modal-body">
+              <div className="org-detail-row">
+                <strong>Email:</strong> <span>{selectedOrganizer.email}</span>
+              </div>
+              <div className="org-detail-row">
+                <strong>Phone:</strong> <span>{selectedOrganizer.phone}</span>
+              </div>
+              {selectedOrganizer.website && (
+                <div className="org-detail-row">
+                  <strong>Website:</strong> <a href={selectedOrganizer.website} target="_blank" rel="noopener noreferrer">{selectedOrganizer.website}</a>
+                </div>
+              )}
+              {selectedOrganizer.description && (
+                <div className="org-detail-row org-detail-desc">
+                  <strong>Description:</strong>
+                  <p>{selectedOrganizer.description}</p>
+                </div>
+              )}
+            </div>
+            <div className="org-modal-actions">
+              {!selectedOrganizer.approved && (
+                <button 
+                  className="approve-btn large"
+                  onClick={() => {
+                    handleApproveOrganizer(selectedOrganizer.id);
+                    setSelectedOrganizer(prev => ({...prev, approved: true}));
+                  }}
+                >
+                  Approve Organizer
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

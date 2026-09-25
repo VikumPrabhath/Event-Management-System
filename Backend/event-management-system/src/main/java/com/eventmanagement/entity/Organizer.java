@@ -23,4 +23,9 @@ public class Organizer {
 
     private boolean isApproved = false;
     private String role = "Organizer";
+
+    // New Profile Fields
+    private String profileImageUrl;
+    private String description;
+    private String website;
 }
