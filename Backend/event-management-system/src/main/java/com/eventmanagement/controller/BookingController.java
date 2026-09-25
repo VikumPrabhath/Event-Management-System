@@ -97,6 +97,8 @@ public class BookingController {
                         event.getImageUrl(),
                         qrCodeImage
                 );
+
+
             } catch (Exception ex) {
                 System.err.println("Error generating QR or sending email: " + ex.getMessage());
             }

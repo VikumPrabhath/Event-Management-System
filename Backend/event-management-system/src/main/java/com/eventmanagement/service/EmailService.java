@@ -44,7 +44,7 @@ public class EmailService {
             helper.setText(htmlContent, true);
 
             if (qrCodeImage != null) {
-                helper.addAttachment("ticket-qr.png", new ByteArrayResource(qrCodeImage));
+                helper.addInline("qrCodeImage", new ByteArrayResource(qrCodeImage), "image/png");
             }
 
             mailSender.send(message);
