@@ -139,7 +139,7 @@ function TicketBooking({ event, onClose, theme, toggleTheme, user, onOpenAuth })
         {bookingComplete ? (
           <div className="booking-success-card">
             <h2>Booking Successful!</h2>
-            <p>Thank you, <strong>{formData.firstName || 'Customer'}</strong>. Your tickets for <strong>{eventTitle}</strong> have been confirmed.</p>
+            <p>Thank you, <strong>{formData.firstName || 'Customer'}</strong>. Your tickets for <strong>{eventTitle}</strong> have been confirmed! We have sent your e-ticket to your email.</p>
             <div className="success-summary-details">
               <div><span>Total Paid:</span> <strong>{grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</strong></div>
               {discountAmount > 0 && <div style={{ color: '#2ecc71' }}><span>Early Bird Saved ({discountPercent}%):</span> <strong>{discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} LKR</strong></div>}
