@@ -27,11 +27,20 @@ function OrganizerDashboard({ user, onLogout, theme, toggleTheme }) {
     }
   }, [user?.id]);
 
-  const handleLogoutClick = () => {
-    if (onLogout) {
-      onLogout();
+  const handleLogoutClick = async () => {
+    try {
+      await fetch('http://localhost:8081/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout request failed:', err);
+    } finally {
+      if (onLogout) {
+        onLogout();
+      }
+      navigate('/', { replace: true });
     }
-    navigate('/');
   };
 
   // Split into upcoming and past based on current date

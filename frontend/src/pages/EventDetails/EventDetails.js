@@ -14,6 +14,7 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    setLoading(true);
     fetch(`http://localhost:8081/api/events/${id}`)
       .then(res => {
         if (!res.ok) throw new Error();
