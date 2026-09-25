@@ -33,8 +33,22 @@ function LandingPage({ onSelectEvent, theme, toggleTheme, user, onOpenAuth, onOp
         }
       })
       .catch(err => console.error('Error loading events:', err))
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
+
+  useEffect(() => {
+    if (!isLoading && window.location.hash) {
+      const targetId = window.location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(targetId) || document.getElementById('events-grid-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [isLoading]);
 
   return (
     <div className={`landing-page ${theme}-mode`}>

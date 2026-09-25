@@ -254,8 +254,8 @@ function Header({ events: propEvents = [], onSelectEvent, theme, toggleTheme, is
             >
               Events {showMegaMenu ? <ChevronUp size={14} style={{marginLeft: '4px'}} /> : <ChevronDown size={14} style={{marginLeft: '4px'}} />}
             </button>
-            <a href="#concerts" className="nav-link">Concerts</a>
-            <a href="#theater" className="nav-link">Theater</a>
+            <a href="#concerts" onClick={handleCategoryNav('#concerts', 'Concerts')} className="nav-link">Concerts</a>
+            <a href="#theater" onClick={handleCategoryNav('#theater', 'Art & Drama')} className="nav-link">Theater</a>
             {user ? (
               <Link to={user.role === 'Organizer' ? "/organizer/dashboard" : "/dashboard"} className="nav-link user-dash-link">
                 My Dashboard

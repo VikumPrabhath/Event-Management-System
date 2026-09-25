@@ -4,6 +4,15 @@ import SportsCard from '../SportsCard/SportsCard';
 import MeetupCard from '../MeetupCard/MeetupCard';
 import './EventSection.css';
 
+const CATEGORY_TAB_MAPPING = {
+  '#concerts': 'Concerts',
+  '#theater': 'Art & Drama',
+  '#drama': 'Art & Drama',
+  '#sports': 'Sports & Adventure',
+  '#family': 'Family',
+  '#tech': 'Tech & Dev'
+};
+
 function EventSection({ events = [], onSelectEvent }) {
   const [activeTab, setActiveTab] = useState('Concerts');
 
@@ -38,7 +47,8 @@ function EventSection({ events = [], onSelectEvent }) {
   const currentTabEvents = getCategorizedEvents(activeTab);
 
   return (
-    <section id="events-grid-section" className="event-section">
+    <section id="concerts" className="event-section">
+      <div id="events-grid-section"></div>
       <div className="section-container">
         <h2 className="section-title">
           <span className="title-highlight">Explore</span> Upcoming Events
