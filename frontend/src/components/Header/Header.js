@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ChevronUp, User, Sun, Moon } from 'lucide-react';
 import EventsMegaMenu from '../EventsMegaMenu/EventsMegaMenu';
 import './Header.css';
 
 function Header({ events: propEvents = [], onSelectEvent, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [imgError, setImgError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -110,6 +111,20 @@ function Header({ events: propEvents = [], onSelectEvent, theme, toggleTheme, is
   const handleClearSearch = () => {
     setSearchTerm('');
     setIsOpen(false);
+  };
+
+  const handleCategoryNav = (hash, tab) => (e) => {
+    e.preventDefault();
+
+    if (location.pathname !== '/') {
+      navigate(`/${hash}`);
+      return;
+    }
+
+    window.location.hash = hash;
+    const element = document.getElementById(hash.substring(1)) || document.getElementById('events-grid-section');
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
+    window.dispatchEvent(new CustomEvent('select-event-tab', { detail: tab }));
   };
 
   const handleSelectEvent = (eventItem) => {
