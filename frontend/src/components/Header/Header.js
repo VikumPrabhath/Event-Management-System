@@ -117,7 +117,7 @@ function Header({ events: propEvents = [], onSelectEvent, theme, toggleTheme, is
     e.preventDefault();
 
     if (location.pathname !== '/') {
-      navigate(`/${hash}`);
+      navigate({ pathname: '/', hash });
       return;
     }
 
