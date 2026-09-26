@@ -4,7 +4,9 @@ import { Search, X, ChevronDown, ChevronUp, User, Sun, Moon } from 'lucide-react
 import EventsMegaMenu from '../EventsMegaMenu/EventsMegaMenu';
 import './Header.css';
 
-function Header({ events: propEvents = [], onSelectEvent, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
+const EMPTY_EVENTS = [];
+
+function Header({ events: propEvents = EMPTY_EVENTS, onSelectEvent, theme, toggleTheme, isAdminView, user, onOpenAuth }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [imgError, setImgError] = useState(false);
