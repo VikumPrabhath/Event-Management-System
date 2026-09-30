@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage/LandingPage';
 import EventDetails from './pages/EventDetails/EventDetails';
 import TicketBooking from './components/TicketBooking/TicketBooking';
@@ -18,6 +18,7 @@ import './App.css';
 
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [connectionStatus, setConnectionStatus] = useState('checking');
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -45,11 +46,33 @@ function AppContent() {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
+  // Listen for global open-auth-modal custom event (e.g. from Footer)
+  useEffect(() => {
+    const handleOpenAuthEvent = () => {
+      setShowAuthModal(true);
+    };
+    window.addEventListener('open-auth-modal', handleOpenAuthEvent);
+    return () => window.removeEventListener('open-auth-modal', handleOpenAuthEvent);
+  }, []);
+
+  // Automatically open auth modal when visiting /login or /signin route
+  useEffect(() => {
+    if (location.pathname === '/login' || location.pathname === '/signin') {
+      if (user) {
+        navigate(user.role === 'Organizer' ? '/organizer/dashboard' : '/dashboard', { replace: true });
+      } else {
+        setShowAuthModal(true);
+      }
+    }
+  }, [location.pathname, user, navigate]);
+
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem('user_session', JSON.stringify(userData));
     if (userData.role === 'Organizer') {
       navigate('/organizer/dashboard');
+    } else if (location.pathname === '/login' || location.pathname === '/signin') {
+      navigate('/dashboard');
     }
   };
 
@@ -115,6 +138,27 @@ function AppContent() {
             />
           } 
         />
+        <Route 
+          path="/login" 
+          element={
+            user ? (
+              <Navigate to={user.role === 'Organizer' ? "/organizer/dashboard" : "/dashboard"} replace />
+            ) : (
+              <LandingPage 
+                onSelectEvent={handleSelectEvent} 
+                theme={theme} 
+                toggleTheme={toggleTheme} 
+                user={user}
+                onOpenAuth={() => setShowAuthModal(true)}
+                onOpenOrganizerAuth={() => setShowOrganizerAuthModal(true)}
+              />
+            )
+          } 
+        />
+        <Route 
+          path="/signin" 
+          element={<Navigate to="/login" replace />} 
+        />
         
         <Route 
           path="/dashboard" 
@@ -140,6 +184,7 @@ function AppContent() {
               onOpenBooking={handleOpenBooking}
               theme={theme}
               toggleTheme={toggleTheme}
+              user={user}
               onOpenAuth={handleOpenAuth}
               refreshTrigger={refreshTrigger}
             />
@@ -244,7 +289,12 @@ function AppContent() {
 
       <AuthModal 
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={() => {
+          setShowAuthModal(false);
+          if (location.pathname === '/login' || location.pathname === '/signin') {
+            navigate('/', { replace: true });
+          }
+        }}
         onLoginSuccess={handleLoginSuccess} 
         onForgotPassword={() => {
           setShowAuthModal(false);

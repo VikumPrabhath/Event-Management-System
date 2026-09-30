@@ -202,7 +202,7 @@ function EventDetails({ onBack, onOpenBooking, theme, toggleTheme, user, onOpenA
         </div>
       </main>
 
-      <Footer />
+      <Footer onOpenAuth={onOpenAuth} user={user} />
     </div>
   );
 }

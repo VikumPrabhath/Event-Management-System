@@ -1,11 +1,45 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Footer.css';
 
-function Footer() {
+function Footer({ onOpenAuth, user }) {
+  const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
 
   const handleLogoError = () => {
     setImgError(true);
+  };
+
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    let currentUser = user;
+    if (!currentUser) {
+      try {
+        const saved = localStorage.getItem('user_session');
+        if (saved) currentUser = JSON.parse(saved);
+      } catch (err) {
+        currentUser = null;
+      }
+    }
+
+    if (currentUser) {
+      navigate(currentUser.role === 'Organizer' ? '/organizer/dashboard' : '/dashboard');
+    } else {
+      if (typeof onOpenAuth === 'function') {
+        onOpenAuth();
+      }
+      window.dispatchEvent(new CustomEvent('open-auth-modal'));
+    }
+  };
+
+  const handleScrollToEvents = (e) => {
+    e.preventDefault();
+    const el = document.getElementById('concerts') || document.getElementById('events-grid-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/#concerts');
+    }
   };
 
   return (
@@ -69,9 +103,9 @@ function Footer() {
                 Concerts
               </a>
             </li>
-            <li><a href="#tickets">Tickets</a></li>
-            <li><a href="#login">Login</a></li>
-            <li><a href="#booking">Booking</a></li>
+            <li><a href="#tickets" onClick={handleScrollToEvents}>Tickets</a></li>
+            <li><a href="#login" onClick={handleLoginClick} id="footer-login-btn">Login</a></li>
+            <li><a href="#booking" onClick={handleScrollToEvents}>Booking</a></li>
           </ul>
         </div>
 

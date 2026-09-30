@@ -73,7 +73,7 @@ function LandingPage({ onSelectEvent, theme, toggleTheme, user, onOpenAuth, onOp
           <EventSection events={events} onSelectEvent={onSelectEvent} />
         </main>
       )}
-      <Footer />
+      <Footer onOpenAuth={onOpenAuth} user={user} />
     </div>
   );
 }
