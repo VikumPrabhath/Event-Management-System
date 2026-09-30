@@ -75,7 +75,7 @@ Run the Backend (Spring Boot) using IntelliJ.
 * Click the **"+" (plus)** button.
 * In **Name**, type exactly: `MONGODB_URI`
 * In **Value**, paste the string provided to you by Vikum.
-*(It will look like: `mongodb+srv://vikumprabhath4_db_user:THE_PASSWORD@cluster0.b7a1gzg.mongodb.net/?retryWrites=true&w=majority`)*
+*(It will look like: `mongodb+srv://db_user:THE_PASSWORD@cluster0.b7a1gzg.mongodb.net/?retryWrites=true&w=majority`)*
 * Click **OK**, then **Apply**, then **OK**.
 
 ###### 5.3 Start the Backend Server
